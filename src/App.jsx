@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Sidebar from './components/layout/Sidebar'
 import DoilyGraph from './components/modules/DoilyGraph'
 import SquarePermutator from './components/modules/SquarePermutator'
+import TextureScanner from './components/modules/TextureScanner'
 
 function App() {
   const [activeModule, setActiveModule] = useState('doily')
@@ -14,12 +15,7 @@ function App() {
       case 'squares':
         return <SquarePermutator />
       case 'texture':
-        return (
-          <div className="p-8">
-            <h2 className="text-3xl font-bold text-charcoal mb-4">Texture Recognition</h2>
-            <p className="text-charcoal/70">Module coming soon...</p>
-          </div>
-        )
+        return <TextureScanner />
       case 'about':
         return (
           <div className="p-8">
