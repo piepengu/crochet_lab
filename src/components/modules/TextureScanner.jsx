@@ -167,7 +167,7 @@ export default function TextureScanner() {
   }, [])
 
   return (
-    <div className="p-4 lg:p-6 max-w-7xl mx-auto w-full">
+    <div className="p-4 lg:p-6 max-w-7xl mx-auto w-full overflow-hidden">
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-3xl font-bold text-charcoal mb-2">
@@ -205,24 +205,32 @@ export default function TextureScanner() {
       )}
 
       {/* Mock Mode Toggle */}
-      {model && (
-        <div className="mb-4 flex items-center gap-2">
-          <label className="flex items-center gap-2 text-sm text-charcoal/70 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={useMockMode}
-              onChange={(e) => setUseMockMode(e.target.checked)}
-              className="rounded"
-            />
-            <span>Use mock mode (for faster demos)</span>
-          </label>
-        </div>
-      )}
+      <div className="mb-4 flex items-center gap-2">
+        <label className="flex items-center gap-2 text-sm text-charcoal/70 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={useMockMode}
+            onChange={(e) => {
+              setUseMockMode(e.target.checked)
+              // Auto-classify if switching to mock mode with an image already loaded
+              if (e.target.checked && imageUrl && !predictions) {
+                setClassifying(true)
+                setTimeout(() => {
+                  setPredictions(mockPredictions)
+                  setClassifying(false)
+                }, 500)
+              }
+            }}
+            className="rounded"
+          />
+          <span>Use mock mode (for faster demos)</span>
+        </label>
+      </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
         {/* Upload & Image Preview Section */}
-        <div className="space-y-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
           {/* Upload Area */}
           {!imageUrl ? (
             <div
@@ -246,18 +254,21 @@ export default function TextureScanner() {
               />
             </div>
           ) : (
-            <div className="bg-canvas-white border border-charcoal/10 rounded-lg p-4">
+            <div style={{ backgroundColor: '#fff', border: '2px solid #333', borderRadius: '8px', padding: '16px' }}>
               {/* Image Preview with Zoom */}
-              <div className="relative overflow-hidden rounded-lg bg-charcoal/5 mb-4" style={{ height: '400px' }}>
-                <div className="absolute inset-0 overflow-auto">
-                  <img
-                    ref={imageRef}
-                    src={imageUrl}
-                    alt="Uploaded crochet texture"
-                    className="w-full h-full object-contain transition-transform duration-200"
-                    style={{ transform: `scale(${zoom})`, transformOrigin: 'center' }}
-                  />
-                </div>
+              <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px', backgroundColor: '#f0f0f0', marginBottom: '16px', height: '300px', maxHeight: '300px' }}>
+                <img
+                  ref={imageRef}
+                  src={imageUrl}
+                  alt="Uploaded crochet texture"
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'contain',
+                    transform: `scale(${zoom})`, 
+                    transformOrigin: 'center' 
+                  }}
+                />
               </div>
 
               {/* Zoom Controls */}
@@ -319,7 +330,7 @@ export default function TextureScanner() {
         </div>
 
         {/* Results Section */}
-        <div className="space-y-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
           {predictions ? (
             <div className="bg-charcoal text-accent-green rounded-lg p-6 font-mono">
               <h3 className="text-lg font-bold mb-4 text-accent-green">Classification Results</h3>
@@ -376,12 +387,29 @@ export default function TextureScanner() {
               </button>
             </div>
           ) : (
-            <div className="bg-canvas-white border border-charcoal/10 rounded-lg p-12 text-center">
-              <p className="text-charcoal/50 text-sm">
+            <div style={{ backgroundColor: '#fafafa', border: '2px solid #ddd', borderRadius: '8px', padding: '48px', textAlign: 'center' }}>
+              <p style={{ color: '#666', fontSize: '14px', marginBottom: '16px' }}>
                 {imageUrl
                   ? 'Classification results will appear here'
                   : 'Upload an image to see classification results'}
               </p>
+              {imageUrl && !classifying && (
+                <button
+                  onClick={handleReclassify}
+                  style={{ 
+                    padding: '12px 24px', 
+                    backgroundColor: '#4A90E2', 
+                    color: 'white', 
+                    border: 'none',
+                    borderRadius: '8px', 
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    fontSize: '16px'
+                  }}
+                >
+                  Classify Image
+                </button>
+              )}
             </div>
           )}
         </div>
