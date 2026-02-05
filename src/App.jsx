@@ -1,11 +1,15 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Sidebar from './components/layout/Sidebar'
 import DoilyGraph from './components/modules/DoilyGraph'
 import SquarePermutator from './components/modules/SquarePermutator'
-import TextureScanner from './components/modules/TextureScanner'
+import ErrorBoundary from './components/shared/ErrorBoundary'
+
+// Lazy load TextureScanner to prevent blocking on initial load
+const TextureScanner = lazy(() => import('./components/modules/TextureScanner'))
 
 function App() {
+  console.log('App.jsx: Component rendering')
   const [activeModule, setActiveModule] = useState('doily')
 
   const renderModule = () => {
@@ -15,7 +19,20 @@ function App() {
       case 'squares':
         return <SquarePermutator />
       case 'texture':
-        return <TextureScanner />
+        return (
+          <ErrorBoundary>
+            <Suspense fallback={
+              <div className="p-8">
+                <div className="flex items-center gap-2 text-charcoal/60">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yarn-blue"></div>
+                  <span>Loading Texture Recognition module...</span>
+                </div>
+              </div>
+            }>
+              <TextureScanner />
+            </Suspense>
+          </ErrorBoundary>
+        )
       case 'about':
         return (
           <div className="p-8">
