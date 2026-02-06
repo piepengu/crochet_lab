@@ -4,6 +4,7 @@ import Sidebar from './components/layout/Sidebar'
 import DoilyGraph from './components/modules/DoilyGraph'
 import SquarePermutator from './components/modules/SquarePermutator'
 import ErrorBoundary from './components/shared/ErrorBoundary'
+import Manifesto from './components/shared/Manifesto'
 
 // Lazy load TextureScanner to prevent blocking on initial load
 const TextureScanner = lazy(() => import('./components/modules/TextureScanner'))
@@ -34,23 +35,18 @@ function App() {
           </ErrorBoundary>
         )
       case 'about':
-        return (
-          <div className="p-8">
-            <h2 className="text-3xl font-bold text-charcoal mb-4">About</h2>
-            <p className="text-charcoal/70">About section coming soon...</p>
-          </div>
-        )
+        return <Manifesto />
       default:
         return null
     }
   }
 
   return (
-    <div className="min-h-screen bg-canvas-white">
+    <div className="min-h-screen bg-canvas-white flex flex-col lg:flex-col">
       <Sidebar activeModule={activeModule} onModuleChange={setActiveModule} />
       
       {/* Main content area */}
-      <main className="lg:ml-64 min-h-screen">
+      <main id="main-content" className="flex-1 pt-16 lg:pt-0 min-h-screen" tabIndex={-1}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeModule}

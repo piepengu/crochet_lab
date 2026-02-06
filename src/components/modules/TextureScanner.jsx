@@ -13,7 +13,6 @@ const mockPredictions = [
 
 export default function TextureScanner() {
   const { model, loading: modelLoading, error: modelError, classifyImage } = useImageClassifier()
-  const [image, setImage] = useState(null)
   const [imageUrl, setImageUrl] = useState(null)
   const [predictions, setPredictions] = useState(null)
   const [classifying, setClassifying] = useState(false)
@@ -37,7 +36,6 @@ export default function TextureScanner() {
       // Create object URL for preview
       const url = URL.createObjectURL(file)
       setImageUrl(url)
-      setImage(file)
       setPredictions(null)
       setClassificationError(null)
       setZoom(1)
@@ -143,7 +141,6 @@ export default function TextureScanner() {
     if (imageUrl) {
       URL.revokeObjectURL(imageUrl)
     }
-    setImage(null)
     setImageUrl(null)
     setPredictions(null)
     setClassificationError(null)
@@ -170,10 +167,10 @@ export default function TextureScanner() {
     <div className="p-4 lg:p-6 max-w-7xl mx-auto w-full overflow-hidden">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-3xl font-bold text-charcoal mb-2">
-          Texture Recognition: Computer Vision for Stitch Identification
+        <h2 className="font-display text-3xl font-normal text-charcoal mb-2">
+          Texture Recognition
         </h2>
-        <p className="text-charcoal/70 text-sm">
+        <p className="text-charcoal/60 text-sm max-w-2xl">
           Upload an image to identify crochet patterns and textures using AI
         </p>
       </div>
@@ -227,10 +224,10 @@ export default function TextureScanner() {
         </label>
       </div>
 
-      {/* Main Content Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+      {/* Main Content Grid - stacks on mobile, 2 columns on md+ */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Upload & Image Preview Section */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
+        <div className="flex flex-col gap-4 min-w-0">
           {/* Upload Area */}
           {!imageUrl ? (
             <div
@@ -330,7 +327,7 @@ export default function TextureScanner() {
         </div>
 
         {/* Results Section */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
+        <div className="flex flex-col gap-4 min-w-0">
           {predictions ? (
             <div className="bg-charcoal text-accent-green rounded-lg p-6 font-mono">
               <h3 className="text-lg font-bold mb-4 text-accent-green">Classification Results</h3>
@@ -423,7 +420,7 @@ export default function TextureScanner() {
           <li>The AI model will automatically analyze and classify the texture</li>
           <li>Results show the top 3 predictions with confidence percentages</li>
           <li>Use zoom controls to examine image details</li>
-          <li>Click "Re-classify" to analyze the image again</li>
+          <li>Click &quot;Re-classify&quot; to analyze the image again</li>
         </ul>
       </div>
     </div>

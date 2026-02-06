@@ -10,6 +10,7 @@ export default {
       fontFamily: {
         mono: ['Space Mono', 'Courier Prime', 'monospace'],
         sans: ['Space Mono', 'Courier Prime', 'monospace'],
+        display: ['Instrument Serif', 'Georgia', 'serif'],
       },
       colors: {
         canvas: {

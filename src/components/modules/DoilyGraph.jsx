@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
+import { useDebounce } from '../../hooks/useDebounce'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -28,6 +29,7 @@ ChartJS.register(
 
 export default function DoilyGraph() {
   const [multiplier, setMultiplier] = useState(1.0)
+  const debouncedMultiplier = useDebounce(multiplier, 80)
   const [showInfo, setShowInfo] = useState(false)
   const chartContainerRef = useRef(null)
 
@@ -44,9 +46,9 @@ export default function DoilyGraph() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Generate chart data based on current multiplier
+  // Generate chart data based on debounced multiplier (reduces re-renders during slider drag)
   const chartData = useMemo(() => {
-    const data = generateDoilyData(maxRows, multiplier, baseStitches)
+    const data = generateDoilyData(maxRows, debouncedMultiplier, baseStitches)
     
     return {
       labels: data.map((d) => d.row),
@@ -87,12 +89,12 @@ export default function DoilyGraph() {
         },
       ],
     }
-  }, [multiplier])
+  }, [debouncedMultiplier])
 
   // Calculate ruffle threshold
   const ruffleThreshold = useMemo(() => {
-    return calculateRuffleThreshold(0.1, multiplier, baseStitches)
-  }, [multiplier])
+    return calculateRuffleThreshold(0.1, debouncedMultiplier, baseStitches)
+  }, [debouncedMultiplier])
 
   const chartOptions = {
     responsive: true,
@@ -206,11 +208,11 @@ export default function DoilyGraph() {
   return (
     <div className="p-3 lg:p-4 max-w-7xl mx-auto w-full">
       {/* Header */}
-      <div className="mb-2">
-        <h2 className="text-lg font-bold text-charcoal mb-0.5">
-          Radial Topology: Hyperbolic Geometry in Crochet
+      <div className="mb-6">
+        <h2 className="font-display text-3xl font-normal text-charcoal mb-2">
+          Radial Topology
         </h2>
-        <p className="text-charcoal/70 text-xs">
+        <p className="text-charcoal/60 text-sm max-w-2xl">
           Explore how mathematical growth patterns create flat planes vs. ruffled surfaces
         </p>
       </div>
@@ -218,40 +220,42 @@ export default function DoilyGraph() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
         {/* Image Section */}
-        <div className="space-y-1">
+        <div className="space-y-3">
           {/* Primary Image */}
-          <div className="relative bg-canvas-white border border-charcoal/10 rounded-lg overflow-hidden" style={{ height: 'min(90px, 13vh)', maxHeight: '90px' }}>
+          <div className="relative bg-white/80 border border-charcoal/10 rounded-xl overflow-hidden shadow-sm">
             <img
               src="/images/doily-white-complex.jpg"
               alt="Radial doily pattern showing hyperbolic geometry"
-              className="w-full h-full object-cover"
-              style={{ maxHeight: '100%', maxWidth: '100%' }}
+              className="w-full h-auto object-cover"
+              style={{ maxHeight: '200px' }}
+              loading="lazy"
               onError={(e) => {
-                // Fallback to other doily images if primary doesn't exist
                 e.target.src = '/images/doily-square-mesh.jpg'
               }}
             />
           </div>
           
           {/* Additional Images Grid */}
-          <div className="grid grid-cols-2 gap-1">
-            <div className="relative bg-canvas-white border border-charcoal/10 rounded-lg overflow-hidden" style={{ height: '42px', maxHeight: '42px' }}>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="relative bg-white/80 border border-charcoal/10 rounded-xl overflow-hidden shadow-sm">
               <img
                 src="/images/doily-radial-beige.jpg"
                 alt="Radial beige doily pattern"
-                className="w-full h-full object-cover"
-                style={{ maxHeight: '100%', maxWidth: '100%' }}
+                className="w-full h-auto object-cover"
+                style={{ maxHeight: '120px' }}
+                loading="lazy"
                 onError={(e) => {
                   e.target.src = '/images/doily-white-complex.jpg'
                 }}
               />
             </div>
-            <div className="relative bg-canvas-white border border-charcoal/10 rounded-lg overflow-hidden" style={{ height: '42px', maxHeight: '42px' }}>
+            <div className="relative bg-white/80 border border-charcoal/10 rounded-xl overflow-hidden shadow-sm">
               <img
                 src="/images/doily-square-mesh.jpg"
                 alt="Square mesh doily pattern"
-                className="w-full h-full object-cover"
-                style={{ maxHeight: '100%', maxWidth: '100%' }}
+                className="w-full h-auto object-cover"
+                style={{ maxHeight: '120px' }}
+                loading="lazy"
                 onError={(e) => {
                   e.target.src = '/images/doily-white-complex.jpg'
                 }}
@@ -259,7 +263,7 @@ export default function DoilyGraph() {
             </div>
           </div>
           
-          <div className="text-xs text-charcoal/60 space-y-1">
+          <div className="text-sm text-charcoal/70 space-y-2">
             <p>
               <strong>Mathematical Insight:</strong> When stitch count grows linearly (multiplier = 1.0),
               the crochet remains flat. As the multiplier increases, exponential growth creates hyperbolic
@@ -274,7 +278,7 @@ export default function DoilyGraph() {
         </div>
 
         {/* Chart Section */}
-        <div className="bg-canvas-white border border-charcoal/10 rounded-lg p-4">
+        <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
           <div 
             ref={chartContainerRef}
             className="w-full" 
@@ -290,7 +294,7 @@ export default function DoilyGraph() {
       </div>
 
       {/* Controls Section */}
-      <div className="bg-canvas-white border border-charcoal/10 rounded-lg p-6">
+      <div className="bg-white/80 border border-charcoal/10 rounded-xl p-6 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center gap-6">
           {/* Slider */}
           <div className="flex-1">
@@ -313,7 +317,12 @@ export default function DoilyGraph() {
               step="0.05"
               value={multiplier}
               onChange={(e) => setMultiplier(parseFloat(e.target.value))}
-              className="w-full h-2 bg-charcoal/10 rounded-lg appearance-none cursor-pointer accent-yarn-blue"
+              className="w-full h-2 bg-charcoal/10 rounded-lg appearance-none cursor-pointer accent-yarn-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+              aria-label="Growth multiplier: controls flat vs ruffled stitch pattern"
+              aria-valuemin={0.8}
+              aria-valuemax={1.5}
+              aria-valuenow={multiplier}
+              aria-valuetext={`${multiplier.toFixed(2)}`}
             />
             <div className="flex justify-between text-xs text-charcoal/50 mt-1">
               <span>0.80 (Flat)</span>
@@ -325,7 +334,8 @@ export default function DoilyGraph() {
           {/* Reset Button */}
           <button
             onClick={handleReset}
-            className="flex items-center gap-2 px-4 py-2 bg-charcoal text-canvas-white rounded-lg hover:bg-charcoal/90 transition-colors text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-charcoal text-canvas-white rounded-lg hover:bg-charcoal/90 transition-colors text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+            aria-label="Reset multiplier to 1.0"
           >
             <RotateCcw size={16} />
             Reset
@@ -334,7 +344,9 @@ export default function DoilyGraph() {
           {/* Info Toggle */}
           <button
             onClick={() => setShowInfo(!showInfo)}
-            className="flex items-center gap-2 px-4 py-2 border border-charcoal/20 text-charcoal rounded-lg hover:bg-charcoal/5 transition-colors text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 border border-charcoal/20 text-charcoal rounded-lg hover:bg-charcoal/5 transition-colors text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+            aria-label={showInfo ? 'Hide formulas' : 'Show mathematical formulas'}
+            aria-expanded={showInfo}
           >
             <Info size={16} />
             Formulas

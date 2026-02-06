@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
-import { RefreshCw, Download, Grid3x3, Square, Grid } from 'lucide-react'
+import clsx from 'clsx'
+import { RefreshCw, Grid3x3, Square, Grid } from 'lucide-react'
 import {
   initializeGrid,
   generateValidPattern,
@@ -72,11 +73,11 @@ export default function SquarePermutator() {
   return (
     <div className="p-4 lg:p-6 max-w-7xl mx-auto w-full">
       {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-3xl font-bold text-charcoal mb-2">
-          Modular Permutations: Graph Coloring Algorithms
+      <div className="mb-8">
+        <h2 className="font-display text-3xl font-normal text-charcoal mb-2">
+          Modular Permutations
         </h2>
-        <p className="text-charcoal/70 text-sm">
+        <p className="text-charcoal/60 text-sm max-w-2xl">
           Generate valid granny square patterns where no two adjacent squares share the same color
         </p>
       </div>
@@ -85,7 +86,7 @@ export default function SquarePermutator() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Grid Display */}
         <div className="lg:col-span-2">
-          <div className="bg-canvas-white border border-charcoal/10 rounded-lg p-6">
+          <div className="bg-white/80 border border-charcoal/10 rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-charcoal">Pattern Grid</h3>
               <div className="flex items-center gap-2">
@@ -93,13 +94,16 @@ export default function SquarePermutator() {
                   <button
                     key={size}
                     onClick={() => handleSizeChange(size)}
-                    className={`flex items-center gap-1 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                    aria-pressed={gridSize === size}
+                    aria-label={`Set grid size to ${label}`}
+                    className={clsx(
+                      'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2',
                       gridSize === size
-                        ? 'bg-yarn-blue text-white'
-                        : 'bg-charcoal/5 text-charcoal hover:bg-charcoal/10'
-                    }`}
+                        ? 'bg-yarn-blue text-white shadow-md ring-2 ring-yarn-blue/30'
+                        : 'bg-charcoal/5 text-charcoal hover:bg-charcoal/10 hover:text-charcoal'
+                    )}
                   >
-                    <Icon size={16} />
+                    <Icon size={18} />
                     {label}
                   </button>
                 ))}
@@ -108,10 +112,13 @@ export default function SquarePermutator() {
 
             {/* Grid */}
             <div
-              className="grid gap-2 mx-auto"
+              className="mx-auto"
               style={{
-                gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
-                maxWidth: '500px',
+                display: 'grid',
+                gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+                gap: '8px',
+                maxWidth: '400px',
+                width: '100%',
               }}
             >
               {grid.map((row, rowIndex) =>
@@ -125,7 +132,7 @@ export default function SquarePermutator() {
                       key={`${rowIndex}-${colIndex}`}
                       onClick={() => handleSquareClick(rowIndex, colIndex)}
                       className={`
-                        aspect-square rounded-lg transition-all duration-200
+                        rounded-lg transition-all duration-200
                         ${color ? '' : 'bg-charcoal/5 border-2 border-dashed border-charcoal/20'}
                         ${isInvalid ? 'ring-2 ring-red-500 ring-offset-2' : ''}
                         hover:scale-105 hover:shadow-lg
@@ -133,6 +140,9 @@ export default function SquarePermutator() {
                       `}
                       style={{
                         backgroundColor: color || undefined,
+                        aspectRatio: '1 / 1',
+                        width: '100%',
+                        minHeight: '60px',
                       }}
                       aria-label={`Square at row ${rowIndex + 1}, column ${colIndex + 1}, color ${color || 'empty'}`}
                     />
@@ -169,13 +179,15 @@ export default function SquarePermutator() {
         {/* Controls & Info */}
         <div className="space-y-4">
           {/* Controls */}
-          <div className="bg-canvas-white border border-charcoal/10 rounded-lg p-4">
+          <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
             <h3 className="text-lg font-semibold text-charcoal mb-4">Controls</h3>
             <div className="space-y-3">
               <button
                 onClick={handleGenerate}
                 disabled={isGenerating}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-yarn-blue text-white rounded-lg hover:bg-yarn-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                aria-busy={isGenerating}
+                aria-label={isGenerating ? 'Generating pattern...' : 'Generate new pattern'}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-yarn-blue text-white rounded-lg hover:bg-yarn-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
               >
                 <RefreshCw size={18} className={isGenerating ? 'animate-spin' : ''} />
                 {isGenerating ? 'Generating...' : 'Generate Pattern'}
@@ -190,7 +202,7 @@ export default function SquarePermutator() {
           </div>
 
           {/* Color Palette */}
-          <div className="bg-canvas-white border border-charcoal/10 rounded-lg p-4">
+          <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
             <h3 className="text-lg font-semibold text-charcoal mb-4">Color Palette</h3>
             <div className="grid grid-cols-2 gap-2">
               {colors.map((color, index) => (
@@ -216,7 +228,7 @@ export default function SquarePermutator() {
 
           {/* Statistics */}
           {Object.keys(colorDistribution).length > 0 && (
-            <div className="bg-canvas-white border border-charcoal/10 rounded-lg p-4">
+            <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
               <h3 className="text-lg font-semibold text-charcoal mb-4">Color Distribution</h3>
               <div className="space-y-2">
                 {Object.entries(colorDistribution).map(([color, count]) => (
@@ -240,11 +252,11 @@ export default function SquarePermutator() {
       </div>
 
       {/* Instructions */}
-      <div className="bg-canvas-white border border-charcoal/10 rounded-lg p-4">
+      <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
         <h3 className="text-sm font-semibold text-charcoal mb-2">How it works</h3>
         <ul className="text-xs text-charcoal/70 space-y-1 list-disc list-inside">
           <li>
-            Click "Generate Pattern" to create a valid pattern using graph coloring algorithms
+            Click &quot;Generate Pattern&quot; to create a valid pattern using graph coloring algorithms
           </li>
           <li>Click any square to manually change its color</li>
           <li>

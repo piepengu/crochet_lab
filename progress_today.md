@@ -68,42 +68,80 @@ const { model, loading, error, classifyImage } = useImageClassifier()
 - ✅ Pushed 3 commits to remote repository
 - Repository: https://github.com/piepengu/crochet_lab.git
 
+### Phase 5: About/Manifesto Section ✅
+- ✅ Created `src/components/shared/Manifesto.jsx`
+- ✅ "The Human Algorithm" hero and main text
+- ✅ Sections: Why This Matters, Mathematics of Craft, Future Explorations
+- ✅ Built With (tech stack), Credits & Inspiration
+- ✅ Staggered Framer Motion animations
+- ✅ Serif font for body text, centered layout
+
+### Phase 6: Polish & Optimization ✅
+
+#### 6.1 Performance
+- ✅ Created `useDebounce` hook
+- ✅ Debounced DoilyGraph slider (80ms) to reduce chart re-renders
+- ✅ Image lazy loading on DoilyGraph doily images
+- ✅ Chart data and ruffle threshold use `useMemo` (already in place)
+
+#### 6.2 Accessibility
+- ✅ Global `:focus-visible` ring styles in `index.css`
+- ✅ Skip-to-main-content link in `index.html`
+- ✅ ARIA labels on DoilyGraph slider, Reset, Formulas buttons
+- ✅ Sidebar: `aria-expanded`, `aria-current`, `aria-label` on nav
+- ✅ SquarePermutator: `aria-pressed`, `aria-busy`, `aria-label` on controls
+- ✅ ErrorBoundary: `role="alert"`, `aria-live`, button labels
+
+#### 6.3 Responsive Design
+- ✅ TextureScanner grid: `grid-cols-1 md:grid-cols-2` (stacks on mobile)
+- ✅ Sidebar collapsible on mobile (lg breakpoint)
+- ✅ Module grids use responsive breakpoints
+
+#### 6.4 Error Handling
+- ✅ ErrorBoundary: Added "Try Again" button (resets state)
+- ✅ ErrorBoundary: `role="alert"` for screen readers
+- ✅ Loading states in TextureScanner, SquarePermutator
+- ✅ Error boundaries wrap App and TextureScanner
+
+### Additional Fixes
+- ✅ SquarePermutator: Fixed grid layout (proper square cells)
+- ✅ DoilyGraph: Fixed doily image sizing (no more tiny 42px images)
+
+### Design Refresh ✅
+- ✅ Added Instrument Serif display font for headings
+- ✅ Shortened module titles (e.g., "Radial Topology" instead of long strings)
+- ✅ Card styling: rounded-xl, shadow-sm, bg-white/80 across modules
+- ✅ Subtle gradient page background (#FAFAFA → #F5F5F5)
+- ✅ Sidebar: backdrop-blur, clearer active state with left border accent
+- ✅ SquarePermutator grid size buttons: clearer selected state (ring + shadow)
+- ✅ Skip link: hidden until keyboard focus (proper sr-only pattern)
+
+### Navigation 2x2 Grid ✅
+- ✅ Sidebar nav changed from vertical list to 2x2 grid layout
+- ✅ Card-style nav items with icon on top, title, description below
+- ✅ Selected item: blue-tinted background, ring, shadow (distinct shade)
+- ✅ Unselected items: light gray background with border
+- ✅ Sidebar widened to w-72 for grid, main content margin updated to lg:ml-72
+
 ---
 
 ## 🎯 Current Status
 
-**Phase:** 4 (Module 3 - Texture Recognition Scanner) - ✅ COMPLETE  
-**All 3 modules are now functional!**
-
-### Modules Status:
-1. ✅ **Radial Topology (Doilies)** - Chart.js visualization working
-2. ✅ **Modular Permutations (Granny Squares)** - Graph coloring algorithm working
-3. ✅ **Texture Recognition (AI Scanner)** - TensorFlow.js integration working
+**Phase:** 5 ✅ COMPLETE | **Phase:** 6 ✅ COMPLETE  
+**All 3 modules functional. App polished and ready for deployment.**
 
 ---
 
 ## 📋 Remaining Tasks
 
-### Phase 5: About/Manifesto Section
-- [ ] Create Manifesto component
-- [ ] "The Human Algorithm" content
-- [ ] Project credits
-
-### Phase 6: Polish & Optimization
-- [ ] Performance optimization
-- [ ] Accessibility improvements
-- [ ] Responsive design testing
-- [ ] Error handling review
-
 ### Phase 7: Deployment
-- [ ] Build configuration
+- [ ] Build configuration (vite.config.js optimizations)
 - [ ] Deploy to Vercel
 
 ---
 
 ## 📝 Known Issues
 
-- TextureScanner layout may need further refinement on some screen sizes
 - MobileNet model loading can be slow on first load
 - Mock mode recommended for demos to avoid model loading delays
 

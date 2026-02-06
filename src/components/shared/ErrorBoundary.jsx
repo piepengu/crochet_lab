@@ -22,7 +22,7 @@ class ErrorBoundary extends Component {
     
     if (this.state.hasError) {
       return (
-        <div style={{ 
+        <div role="alert" aria-live="assertive" style={{ 
           padding: '2rem', 
           backgroundColor: '#FAFAFA', 
           color: '#1A1A1A',
@@ -50,23 +50,38 @@ class ErrorBoundary extends Component {
           <p style={{ color: '#666', fontSize: '0.875rem', marginTop: '1rem' }}>
             Please check the browser console for details.
           </p>
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              marginTop: '1rem',
-              padding: '0.5rem 1rem',
-              backgroundColor: '#4A90E2',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '1rem'
-            }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#357ABD'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#4A90E2'}
-          >
-            Reload Page
-          </button>
+          <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => this.setState({ hasError: false, error: null })}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#4A90E2',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '1rem'
+              }}
+              aria-label="Try again"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#1A1A1A',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '1rem'
+              }}
+              aria-label="Reload page"
+            >
+              Reload Page
+            </button>
+          </div>
         </div>
       )
     }
