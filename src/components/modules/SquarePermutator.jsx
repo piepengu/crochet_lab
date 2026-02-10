@@ -139,7 +139,9 @@ export default function SquarePermutator() {
                         focus:outline-none focus:ring-2 focus:ring-yarn-blue focus:ring-offset-2
                       `}
                       style={{
-                        backgroundColor: color || undefined,
+                        background: color
+                          ? `radial-gradient(circle at 35% 35%, color-mix(in srgb, ${color} 85%, white), ${color})`
+                          : undefined,
                         aspectRatio: '1 / 1',
                         width: '100%',
                         minHeight: '60px',
