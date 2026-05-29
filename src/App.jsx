@@ -42,11 +42,15 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-canvas-white flex flex-col lg:flex-col">
+    <div className="min-h-screen bg-canvas-white flex flex-col">
       <Sidebar activeModule={activeModule} onModuleChange={setActiveModule} />
-      
-      {/* Main content area */}
-      <main id="main-content" className="flex-1 pt-16 lg:pt-0 min-h-screen" tabIndex={-1}>
+
+      {/* Main content — z-0 so nav (z-50+) always stacks above */}
+      <main
+        id="main-content"
+        className="relative z-0 flex-1 min-h-0 overflow-x-hidden pt-14 sm:pt-16 lg:pt-0"
+        tabIndex={-1}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={activeModule}

@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { Upload, Loader2, X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
+import StitchDivider from '../shared/StitchDivider'
 import { useImageClassifier } from '../../hooks/useImageClassifier'
 
 /**
@@ -415,6 +416,7 @@ export default function TextureScanner() {
       {/* Instructions */}
       <div className="bg-canvas-white border border-charcoal/10 rounded-lg p-4">
         <h3 className="text-sm font-semibold text-charcoal mb-2">How it works</h3>
+        <StitchDivider color="rgba(26,26,26,0.15)" height={16} segmentCount={8} className="mb-3" />
         <ul className="text-xs text-charcoal/70 space-y-1 list-disc list-inside">
           <li>Upload an image of crochet work or textured fabric</li>
           <li>The AI model will automatically analyze and classify the texture</li>

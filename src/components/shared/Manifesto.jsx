@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Github, ExternalLink, Heart } from 'lucide-react'
+import StitchDivider from './StitchDivider'
 
 /**
  * Manifesto / About page component
@@ -79,11 +80,14 @@ export default function Manifesto() {
         {/* Why This Matters */}
         <motion.section variants={itemVariants} className="mb-16">
           <h2 
-            className="text-2xl lg:text-3xl font-bold text-charcoal mb-6 border-b border-charcoal/10 pb-3"
+            className="text-2xl lg:text-3xl font-bold text-charcoal mb-4"
             style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
           >
             Why This Matters
           </h2>
+          <div className="mb-6">
+            <StitchDivider color="rgba(26,26,26,0.2)" strokeWidth={1.5} />
+          </div>
           <div 
             className="text-charcoal/80 leading-relaxed space-y-4"
             style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
@@ -107,11 +111,14 @@ export default function Manifesto() {
         {/* The Mathematics of Craft */}
         <motion.section variants={itemVariants} className="mb-16">
           <h2 
-            className="text-2xl lg:text-3xl font-bold text-charcoal mb-6 border-b border-charcoal/10 pb-3"
+            className="text-2xl lg:text-3xl font-bold text-charcoal mb-4"
             style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
           >
             The Mathematics of Craft
           </h2>
+          <div className="mb-6">
+            <StitchDivider color="rgba(26,26,26,0.2)" strokeWidth={1.5} />
+          </div>
           <div className="grid gap-6 md:grid-cols-3">
             <div className="bg-charcoal/5 rounded-lg p-6">
               <h3 className="font-bold text-charcoal mb-2 font-mono text-sm uppercase tracking-wide">
@@ -149,11 +156,14 @@ export default function Manifesto() {
         {/* Future Explorations */}
         <motion.section variants={itemVariants} className="mb-16">
           <h2 
-            className="text-2xl lg:text-3xl font-bold text-charcoal mb-6 border-b border-charcoal/10 pb-3"
+            className="text-2xl lg:text-3xl font-bold text-charcoal mb-4"
             style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
           >
             Future Explorations
           </h2>
+          <div className="mb-6">
+            <StitchDivider color="rgba(26,26,26,0.2)" strokeWidth={1.5} />
+          </div>
           <div 
             className="text-charcoal/80 leading-relaxed space-y-4"
             style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
@@ -172,11 +182,14 @@ export default function Manifesto() {
         {/* Tech Stack */}
         <motion.section variants={itemVariants} className="mb-16">
           <h2 
-            className="text-2xl lg:text-3xl font-bold text-charcoal mb-6 border-b border-charcoal/10 pb-3"
+            className="text-2xl lg:text-3xl font-bold text-charcoal mb-4"
             style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
           >
             Built With
           </h2>
+          <div className="mb-6">
+            <StitchDivider color="rgba(26,26,26,0.2)" strokeWidth={1.5} />
+          </div>
           <div className="flex flex-wrap gap-3">
             {[
               'React',
@@ -201,11 +214,14 @@ export default function Manifesto() {
         {/* Credits & Links */}
         <motion.section variants={itemVariants} className="mb-16">
           <h2 
-            className="text-2xl lg:text-3xl font-bold text-charcoal mb-6 border-b border-charcoal/10 pb-3"
+            className="text-2xl lg:text-3xl font-bold text-charcoal mb-4"
             style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
           >
             Credits & Inspiration
           </h2>
+          <div className="mb-6">
+            <StitchDivider color="rgba(26,26,26,0.2)" strokeWidth={1.5} />
+          </div>
           <div 
             className="text-charcoal/80 leading-relaxed space-y-4"
             style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
@@ -225,8 +241,11 @@ export default function Manifesto() {
         {/* Footer */}
         <motion.footer 
           variants={itemVariants} 
-          className="text-center pt-8 border-t border-charcoal/10"
+          className="text-center pt-8"
         >
+          <div className="mb-8">
+            <StitchDivider color="rgba(26,26,26,0.2)" strokeWidth={1.5} />
+          </div>
           <p className="text-charcoal/60 mb-4 flex items-center justify-center gap-2">
             Made with <Heart size={16} className="text-red-500 fill-red-500" /> and yarn
           </p>

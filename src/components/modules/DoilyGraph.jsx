@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef, lazy, Suspense } from 'react'
 import { useDebounce } from '../../hooks/useDebounce'
 import {
   Chart as ChartJS,
@@ -13,7 +13,10 @@ import {
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import { RotateCcw, Info } from 'lucide-react'
+import StitchDivider from '../shared/StitchDivider'
 import { generateDoilyData, calculateRuffleThreshold } from '../../utils/doilyMath'
+
+const Doily3D = lazy(() => import('./Doily3D'))
 
 // Register Chart.js components
 ChartJS.register(
@@ -33,7 +36,7 @@ export default function DoilyGraph() {
   const [showInfo, setShowInfo] = useState(false)
   const chartContainerRef = useRef(null)
 
-  const maxRows = 20
+  const maxRows = 16
   const baseStitches = 6
 
   // Force chart resize on window resize
@@ -219,20 +222,32 @@ export default function DoilyGraph() {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
-        {/* Image Section */}
+        {/* 3D + reference images */}
         <div className="space-y-3">
-          {/* Primary Image */}
-          <div className="relative bg-white/80 border border-charcoal/10 rounded-xl overflow-hidden shadow-sm">
-            <img
-              src="/images/doily-white-complex.jpg"
-              alt="Radial doily pattern showing hyperbolic geometry"
-              className="w-full h-auto object-cover"
-              style={{ maxHeight: '200px' }}
-              loading="lazy"
-              onError={(e) => {
-                e.target.src = '/images/doily-square-mesh.jpg'
-              }}
-            />
+          <div>
+            <h3 className="text-xs font-semibold text-charcoal/70 uppercase tracking-wide mb-2">
+              3D Hyperbolic Surface
+            </h3>
+            <Suspense
+              fallback={
+                <div
+                  className="flex items-center justify-center rounded-xl border border-charcoal/10 bg-charcoal/5"
+                  style={{ minHeight: '280px' }}
+                >
+                  <div className="flex items-center gap-2 text-charcoal/60 text-sm">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yarn-blue" />
+                    Loading 3D view…
+                  </div>
+                </div>
+              }
+            >
+              <Doily3D
+                multiplier={debouncedMultiplier}
+                displayMultiplier={multiplier}
+                maxRows={maxRows}
+                baseStitches={baseStitches}
+              />
+            </Suspense>
           </div>
           
           {/* Additional Images Grid */}
@@ -355,7 +370,8 @@ export default function DoilyGraph() {
 
         {/* Mathematical Formulas (Collapsible) */}
         {showInfo && (
-          <div className="mt-6 pt-6 border-t border-charcoal/10 space-y-3 text-sm">
+          <div className="mt-6 pt-6 space-y-3 text-sm">
+            <StitchDivider color="rgba(26,26,26,0.2)" className="mb-6" />
             <div className="bg-charcoal/5 p-4 rounded-lg font-mono text-xs space-y-2">
               <div>
                 <strong className="text-yarn-blue">Linear Growth:</strong>{' '}

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { RefreshCw, Grid3x3, Square, Grid } from 'lucide-react'
+import StitchDivider from '../shared/StitchDivider'
 import {
   initializeGrid,
   generateValidPattern,
@@ -256,6 +257,7 @@ export default function SquarePermutator() {
       {/* Instructions */}
       <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
         <h3 className="text-sm font-semibold text-charcoal mb-2">How it works</h3>
+        <StitchDivider color="rgba(26,26,26,0.15)" height={16} segmentCount={8} className="mb-3" />
         <ul className="text-xs text-charcoal/70 space-y-1 list-disc list-inside">
           <li>
             Click &quot;Generate Pattern&quot; to create a valid pattern using graph coloring algorithms

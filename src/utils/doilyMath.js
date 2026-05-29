@@ -86,3 +86,89 @@ export function calculateRuffleThreshold(threshold = 0.1, multiplier = 1.2, base
   }
   return null // Threshold never reached
 }
+
+/**
+ * Adjusted stitch count for a row (matches chart "Adjusted Growth" line)
+ */
+export function getAdjustedStitches(row, multiplier = 1.0, baseStitches = 6) {
+  const linear = linearGrowth(row, baseStitches)
+  const exponential = exponentialGrowth(row, multiplier, baseStitches)
+
+  if (multiplier === 1.0) {
+    return linear
+  }
+
+  const blend = Math.min((multiplier - 1.0) / 0.5, 1.0)
+  return linear + (exponential - linear) * blend
+}
+
+/**
+ * Build vertex/index buffers for a procedural doily mesh.
+ * Rings expand radially; when stitch circumference exceeds 2πr, vertices
+ * buckle on the Y axis (hyperbolic ruffle).
+ *
+ * @returns {{ positions: Float32Array, indices: Uint16Array }}
+ */
+export function generateDoilyMeshGeometry({
+  maxRows = 16,
+  multiplier = 1.0,
+  baseStitches = 6,
+  ringStep = 0.14,
+  stitchArc = 0.1,
+  ruffleScale = 0.12,
+  segmentsPerRing = 36,
+} = {}) {
+  const positions = []
+  const indices = []
+
+  // Center vertex (ring 0)
+  positions.push(0, 0, 0)
+
+  for (let row = 1; row <= maxRows; row++) {
+    const radius = row * ringStep
+    const stitches = getAdjustedStitches(row, multiplier, baseStitches)
+    const flatCircumference = 2 * Math.PI * radius
+    const actualCircumference = stitches * stitchArc
+    const excess =
+      flatCircumference > 0
+        ? Math.max(0, (actualCircumference - flatCircumference) / flatCircumference)
+        : 0
+
+    for (let i = 0; i < segmentsPerRing; i++) {
+      const theta = (i / segmentsPerRing) * Math.PI * 2
+      const wave = Math.sin(theta * Math.max(4, Math.round(stitches / 2)))
+      const y = wave * Math.min(excess * ruffleScale * Math.sqrt(row), 0.4)
+      positions.push(radius * Math.cos(theta), y, radius * Math.sin(theta))
+    }
+  }
+
+  const centerIndex = 0
+  const firstRingOffset = 1
+
+  // Fan triangles from center to first ring
+  for (let i = 0; i < segmentsPerRing; i++) {
+    const next = (i + 1) % segmentsPerRing
+    indices.push(centerIndex, firstRingOffset + i, firstRingOffset + next)
+  }
+
+  // Quads between consecutive rings
+  for (let row = 1; row < maxRows; row++) {
+    const innerOffset = firstRingOffset + (row - 1) * segmentsPerRing
+    const outerOffset = firstRingOffset + row * segmentsPerRing
+
+    for (let i = 0; i < segmentsPerRing; i++) {
+      const next = (i + 1) % segmentsPerRing
+      const a = innerOffset + i
+      const b = outerOffset + i
+      const c = outerOffset + next
+      const d = innerOffset + next
+      indices.push(a, b, c)
+      indices.push(a, c, d)
+    }
+  }
+
+  return {
+    positions: new Float32Array(positions),
+    indices: new Uint16Array(indices),
+  }
+}

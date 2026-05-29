@@ -42,7 +42,7 @@ export default function Sidebar({ activeModule, onModuleChange }) {
       {/* Mobile menu button */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="fixed top-4 left-4 z-50 lg:hidden p-2 rounded-md bg-charcoal text-canvas-white hover:bg-charcoal/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+        className="fixed top-3 left-3 z-[100] lg:hidden p-2.5 rounded-lg bg-charcoal text-canvas-white shadow-md hover:bg-charcoal/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
         aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isMobileOpen}
       >
@@ -53,10 +53,10 @@ export default function Sidebar({ activeModule, onModuleChange }) {
       <aside
         aria-label="Main navigation"
         className={clsx(
-          'fixed top-0 left-0 h-full bg-white/95 backdrop-blur-sm border-r border-charcoal/10 z-40 transition-transform duration-300 ease-in-out shadow-sm',
-          'lg:translate-x-0 lg:static lg:z-auto lg:w-full lg:h-auto lg:border-r-0 lg:border-b',
+          'fixed top-0 left-0 h-full bg-white/95 backdrop-blur-sm border-r border-charcoal/10 z-50 transition-transform duration-300 ease-in-out shadow-sm',
+          'lg:translate-x-0 lg:sticky lg:top-0 lg:z-50 lg:w-full lg:h-auto lg:max-h-none lg:border-r-0 lg:border-b lg:shadow-md',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-          'w-72 flex flex-col lg:flex-row lg:items-center lg:justify-between lg:px-6 lg:py-4'
+          'w-72 flex flex-col lg:flex-row lg:items-center lg:justify-between lg:px-6 lg:py-3 shrink-0'
         )}
       >
         {/* Logo/Title */}
@@ -112,7 +112,7 @@ export default function Sidebar({ activeModule, onModuleChange }) {
       {/* Mobile overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-charcoal/50 z-30 lg:hidden"
+          className="fixed inset-0 bg-charcoal/50 z-40 lg:hidden"
           onClick={() => setIsMobileOpen(false)}
           aria-hidden="true"
         />

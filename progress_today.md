@@ -123,12 +123,26 @@ const { model, loading, error, classifyImage } = useImageClassifier()
 - ✅ Unselected items: light gray background with border
 - ✅ Sidebar widened to w-72 for grid, main content margin updated to lg:ml-72
 
+### CURSOR_UPGRADE_PLAN Phase 1.3 – SVG Stitch Dividers ✅
+- ✅ StitchDivider component (crochet chain-style SVG)
+- ✅ Manifesto: section borders replaced with StitchDivider
+- ✅ DoilyGraph: StitchDivider in collapsible formulas section
+- ✅ SquarePermutator: StitchDivider in "How it works" card
+- ✅ TextureScanner: StitchDivider in "How it works" card
+
+### CURSOR_UPGRADE_PLAN Phase 2 – 3D Hyperbolic Visualization ✅
+- ✅ Installed `three`, `@react-three/fiber@8`, `@react-three/drei@9` (React 18 compatible)
+- ✅ `generateDoilyMeshGeometry()` + `getAdjustedStitches()` in `doilyMath.js`
+- ✅ `Doily3D.jsx`: procedural mesh, OrbitControls, tied to multiplier slider
+- ✅ Lazy-loaded in DoilyGraph (replaces primary static image area)
+- 📋 **Next:** Phase 3.2 PDF pattern export (SquarePermutator)
+
 ---
 
 ## 🎯 Current Status
 
-**Phase:** 5 ✅ COMPLETE | **Phase:** 6 ✅ COMPLETE  
-**All 3 modules functional. App polished and ready for deployment.**
+**Phase:** 5 ✅ COMPLETE | **Phase:** 6 ✅ COMPLETE | **Upgrade Phase 2** ✅ COMPLETE  
+**All 3 modules functional. Radial Topology now includes interactive 3D ruffle visualization.**
 
 ---
 
