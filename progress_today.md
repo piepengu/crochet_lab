@@ -135,14 +135,19 @@ const { model, loading, error, classifyImage } = useImageClassifier()
 - ✅ `generateDoilyMeshGeometry()` + `getAdjustedStitches()` in `doilyMath.js`
 - ✅ `Doily3D.jsx`: procedural mesh, OrbitControls, tied to multiplier slider
 - ✅ Lazy-loaded in DoilyGraph (replaces primary static image area)
-- 📋 **Next:** Phase 3.2 PDF pattern export (SquarePermutator)
+### CURSOR_UPGRADE_PLAN Phase 3.2 – PDF Pattern Export ✅
+- ✅ Installed `@react-pdf/renderer`
+- ✅ `patternExport.js` — row instructions (A/B/C/D), yarn estimates (~8 g/square)
+- ✅ `PatternPdfDocument.jsx` — grid, color key, instructions, usage table
+- ✅ `downloadPatternPdf.jsx` — lazy-loaded PDF generation
+- ✅ SquarePermutator: **Download Pattern PDF** button
 
 ---
 
 ## 🎯 Current Status
 
-**Phase:** 5 ✅ COMPLETE | **Phase:** 6 ✅ COMPLETE | **Upgrade Phase 2** ✅ COMPLETE  
-**All 3 modules functional. Radial Topology now includes interactive 3D ruffle visualization.**
+**Upgrade Phase 2** ✅ | **Phase 3.2 PDF export** ✅  
+**Next:** Phase 3.1 Stash Buster, or Phase 4 Explainable AI
 
 ---
 

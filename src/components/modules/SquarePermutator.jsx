@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import clsx from 'clsx'
-import { RefreshCw, Grid3x3, Square, Grid } from 'lucide-react'
+import { RefreshCw, Grid3x3, Square, Grid, Download } from 'lucide-react'
 import StitchDivider from '../shared/StitchDivider'
 import {
   initializeGrid,
@@ -24,6 +24,8 @@ export default function SquarePermutator() {
   const [colors, setColors] = useState(DEFAULT_COLORS)
   const [attempts, setAttempts] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
+  const [exportMessage, setExportMessage] = useState(null)
   const [lastSuccess, setLastSuccess] = useState(true)
 
   // Generate a new pattern
@@ -70,6 +72,26 @@ export default function SquarePermutator() {
   const isValid = isGridValid(grid)
   const invalidSquares = findInvalidSquares(grid)
   const colorDistribution = countColorDistribution(grid)
+  const hasPattern = grid.some((row) => row.some((c) => c != null))
+
+  const handleDownloadPdf = useCallback(async () => {
+    if (!hasPattern) return
+    setIsExporting(true)
+    setExportMessage(null)
+    try {
+      const { downloadPatternPdf } = await import('../../utils/downloadPatternPdf')
+      await downloadPatternPdf(grid, colors, gridSize, isValid)
+      setExportMessage({ type: 'success', text: 'PDF downloaded — check your Downloads folder.' })
+    } catch (err) {
+      console.error('PDF export failed:', err)
+      setExportMessage({
+        type: 'error',
+        text: 'PDF export failed. Try again or use a desktop browser.',
+      })
+    } finally {
+      setIsExporting(false)
+    }
+  }, [grid, colors, gridSize, isValid, hasPattern])
 
   return (
     <div className="p-4 lg:p-6 max-w-7xl mx-auto w-full">
@@ -196,6 +218,33 @@ export default function SquarePermutator() {
                 {isGenerating ? 'Generating...' : 'Generate Pattern'}
               </button>
 
+              <button
+                onClick={handleDownloadPdf}
+                disabled={!hasPattern || isExporting}
+                aria-busy={isExporting}
+                aria-label={
+                  isExporting ? 'Generating PDF...' : 'Download pattern as PDF'
+                }
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-charcoal/20 text-charcoal rounded-lg hover:bg-charcoal/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+              >
+                <Download size={18} className={isExporting ? 'animate-pulse' : ''} />
+                {isExporting ? 'Creating PDF...' : 'Download Pattern PDF'}
+              </button>
+
+              {exportMessage && (
+                <div
+                  role="status"
+                  className={clsx(
+                    'text-xs p-2 rounded',
+                    exportMessage.type === 'success'
+                      ? 'text-accent-green bg-green-50'
+                      : 'text-red-600 bg-red-50'
+                  )}
+                >
+                  {exportMessage.text}
+                </div>
+              )}
+
               {!lastSuccess && (
                 <div className="text-xs text-red-500 bg-red-50 p-2 rounded">
                   Failed to generate valid pattern. Try with fewer colors or smaller grid.
@@ -268,6 +317,10 @@ export default function SquarePermutator() {
             color
           </li>
           <li>Invalid patterns are highlighted with red borders</li>
+          <li>
+            Use &quot;Download Pattern PDF&quot; for a printable grid, row instructions, and yarn
+            estimates
+          </li>
         </ul>
       </div>
     </div>
