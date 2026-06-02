@@ -119,10 +119,33 @@ export function useImageClassifier() {
     [model]
   )
 
+  /**
+   * Compute a spatial activation heatmap from an intermediate conv layer.
+   * Requires the raw MobileNet instance (has internal graph model).
+   */
+  const getActivationHeatmap = useCallback(
+    async (imageElement) => {
+      if (!model) {
+        throw new Error('Model not loaded yet')
+      }
+      if (!imageElement) {
+        throw new Error('Image element is required')
+      }
+
+      const { computeActivationHeatmap, heatmapToDataUrl } = await import(
+        '../utils/activationHeatmap'
+      )
+      const map = await computeActivationHeatmap(model, imageElement)
+      return heatmapToDataUrl(map)
+    },
+    [model]
+  )
+
   return {
     model,
     loading,
     error,
     classifyImage,
+    getActivationHeatmap,
   }
 }

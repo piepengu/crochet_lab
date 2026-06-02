@@ -142,12 +142,18 @@ const { model, loading, error, classifyImage } = useImageClassifier()
 - ✅ `downloadPatternPdf.jsx` — lazy-loaded PDF generation
 - ✅ SquarePermutator: **Download Pattern PDF** button
 
+### CURSOR_UPGRADE_PLAN Phase 4.1 – Explainable AI Heatmaps ✅
+- ✅ `activationHeatmap.js` — MobileNet conv activations + mock edge-based fallback
+- ✅ `ActivationHeatmapOverlay.jsx` — multiply blend overlay on image preview
+- ✅ `useImageClassifier` — `getActivationHeatmap()` hook API
+- ✅ TextureScanner — attention map toggle, auto-generate on classify, mock mode support
+
 ---
 
 ## 🎯 Current Status
 
-**Upgrade Phase 2** ✅ | **Phase 3.2 PDF export** ✅  
-**Next:** Phase 3.1 Stash Buster, or Phase 4 Explainable AI
+**Upgrade Phase 2** ✅ | **Phase 3.2 PDF export** ✅ | **Phase 4.1 Explainable AI** ✅  
+**Next:** Phase 3.1 Stash Buster, or Phase 5 micro-interactions
 
 ---
 

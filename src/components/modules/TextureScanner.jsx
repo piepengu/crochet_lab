@@ -1,6 +1,7 @@
-import { useState, useRef, useCallback } from 'react'
-import { Upload, Loader2, X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
+import { useState, useRef, useCallback, useEffect, useId } from 'react'
+import { Upload, Loader2, X, ZoomIn, ZoomOut, RotateCcw, Eye, EyeOff } from 'lucide-react'
 import StitchDivider from '../shared/StitchDivider'
+import ActivationHeatmapOverlay from './ActivationHeatmapOverlay'
 import { useImageClassifier } from '../../hooks/useImageClassifier'
 
 /**
@@ -13,15 +14,80 @@ const mockPredictions = [
 ]
 
 export default function TextureScanner() {
-  const { model, loading: modelLoading, error: modelError, classifyImage } = useImageClassifier()
+  const {
+    model,
+    loading: modelLoading,
+    error: modelError,
+    classifyImage,
+    getActivationHeatmap,
+  } = useImageClassifier()
   const [imageUrl, setImageUrl] = useState(null)
   const [predictions, setPredictions] = useState(null)
   const [classifying, setClassifying] = useState(false)
   const [classificationError, setClassificationError] = useState(null)
   const [useMockMode, setUseMockMode] = useState(false)
+  const [showHeatmap, setShowHeatmap] = useState(true)
+  const [heatmapUrl, setHeatmapUrl] = useState(null)
+  const [heatmapError, setHeatmapError] = useState(null)
   const [zoom, setZoom] = useState(1)
   const fileInputRef = useRef(null)
   const imageRef = useRef(null)
+  const fileInputId = useId()
+
+  const buildHeatmap = useCallback(
+    async (img) => {
+      if (!showHeatmap) {
+        setHeatmapUrl(null)
+        setHeatmapError(null)
+        return
+      }
+
+      try {
+        setHeatmapError(null)
+        if (useMockMode) {
+          const { computeMockHeatmap, heatmapToDataUrl } = await import(
+            '../../utils/activationHeatmap'
+          )
+          const map = computeMockHeatmap(img)
+          setHeatmapUrl(heatmapToDataUrl(map))
+        } else if (model && getActivationHeatmap) {
+          const url = await getActivationHeatmap(img)
+          setHeatmapUrl(url)
+        }
+      } catch (err) {
+        console.warn('Heatmap generation failed:', err)
+        setHeatmapError(err.message || 'Could not generate attention map')
+        setHeatmapUrl(null)
+      }
+    },
+    [showHeatmap, useMockMode, model, getActivationHeatmap]
+  )
+
+  const analyzeImage = useCallback(
+    async (img) => {
+      setClassifying(true)
+      setClassificationError(null)
+
+      try {
+        if (useMockMode) {
+          await new Promise((r) => setTimeout(r, 400))
+          setPredictions(mockPredictions)
+        } else {
+          const results = await classifyImage(img, 3)
+          setPredictions(results)
+        }
+        await buildHeatmap(img)
+      } catch (err) {
+        console.error('Classification error:', err)
+        setClassificationError(err.message)
+        setPredictions(null)
+        setHeatmapUrl(null)
+      } finally {
+        setClassifying(false)
+      }
+    },
+    [useMockMode, classifyImage, buildHeatmap]
+  )
 
   // Handle file selection
   const handleFileSelect = useCallback(
@@ -38,36 +104,20 @@ export default function TextureScanner() {
       const url = URL.createObjectURL(file)
       setImageUrl(url)
       setPredictions(null)
+      setHeatmapUrl(null)
+      setHeatmapError(null)
       setClassificationError(null)
       setZoom(1)
 
-      // Auto-classify if model is loaded
-      if (model && !useMockMode) {
-        // Wait for image to load
-        const img = new Image()
-        img.onload = async () => {
-          try {
-            setClassifying(true)
-            const results = await classifyImage(img, 3)
-            setPredictions(results)
-            setClassifying(false)
-          } catch (err) {
-            console.error('Classification error:', err)
-            setClassificationError(err.message)
-            setClassifying(false)
-          }
+      const img = new Image()
+      img.onload = () => {
+        if (useMockMode || model) {
+          analyzeImage(img)
         }
-        img.src = url
-      } else if (useMockMode) {
-        // Use mock predictions
-        setClassifying(true)
-        setTimeout(() => {
-          setPredictions(mockPredictions)
-          setClassifying(false)
-        }, 500)
       }
+      img.src = url
     },
-    [model, classifyImage, useMockMode]
+    [model, useMockMode, analyzeImage]
   )
 
   // Handle drag and drop
@@ -93,49 +143,37 @@ export default function TextureScanner() {
       if (file) {
         handleFileSelect(file)
       }
+      // Allow re-selecting the same file and avoid stale change events
+      e.target.value = ''
     },
     [handleFileSelect]
   )
 
+  // If user picked a file before MobileNet finished loading, classify once ready
+  useEffect(() => {
+    if (!imageUrl || useMockMode || !model || predictions || classifying) return
+
+    const img = new Image()
+    img.onload = () => analyzeImage(img)
+    img.src = imageUrl
+
+    return () => {
+      img.onload = null
+    }
+  }, [imageUrl, useMockMode, model, predictions, classifying, analyzeImage])
+
   // Re-classify image
   const handleReclassify = useCallback(async () => {
     if (!imageUrl) return
-
-    if (useMockMode) {
-      setClassifying(true)
-      setTimeout(() => {
-        setPredictions(mockPredictions)
-        setClassifying(false)
-      }, 500)
-      return
-    }
-
-    if (!model) {
+    if (!useMockMode && !model) {
       setClassificationError('Model not loaded')
       return
     }
 
-    try {
-      setClassifying(true)
-      setClassificationError(null)
-
-      const img = new Image()
-      img.onload = async () => {
-        try {
-          const results = await classifyImage(img, 3)
-          setPredictions(results)
-          setClassifying(false)
-        } catch (err) {
-          setClassificationError(err.message)
-          setClassifying(false)
-        }
-      }
-      img.src = imageUrl
-    } catch (err) {
-      setClassificationError(err.message)
-      setClassifying(false)
-    }
-  }, [imageUrl, model, classifyImage, useMockMode])
+    const img = new Image()
+    img.onload = () => analyzeImage(img)
+    img.src = imageUrl
+  }, [imageUrl, model, useMockMode, analyzeImage])
 
   // Clear image
   const handleClear = useCallback(() => {
@@ -144,6 +182,8 @@ export default function TextureScanner() {
     }
     setImageUrl(null)
     setPredictions(null)
+    setHeatmapUrl(null)
+    setHeatmapError(null)
     setClassificationError(null)
     setZoom(1)
     if (fileInputRef.current) {
@@ -211,12 +251,10 @@ export default function TextureScanner() {
             onChange={(e) => {
               setUseMockMode(e.target.checked)
               // Auto-classify if switching to mock mode with an image already loaded
-              if (e.target.checked && imageUrl && !predictions) {
-                setClassifying(true)
-                setTimeout(() => {
-                  setPredictions(mockPredictions)
-                  setClassifying(false)
-                }, 500)
+              if (e.target.checked && imageUrl) {
+                const img = new Image()
+                img.onload = () => analyzeImage(img)
+                img.src = imageUrl
               }
             }}
             className="rounded"
@@ -231,26 +269,29 @@ export default function TextureScanner() {
         <div className="flex flex-col gap-4 min-w-0">
           {/* Upload Area */}
           {!imageUrl ? (
-            <div
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              className="border-2 border-dashed border-charcoal/20 rounded-lg p-12 text-center hover:border-yarn-blue/50 transition-colors cursor-pointer bg-canvas-white"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload size={48} className="mx-auto mb-4 text-charcoal/30" />
-              <h3 className="text-lg font-semibold text-charcoal mb-2">
-                Drag & drop an image here
-              </h3>
-              <p className="text-sm text-charcoal/60 mb-4">or click to browse</p>
-              <p className="text-xs text-charcoal/50">Supports: JPG, PNG, WebP</p>
+            <>
               <input
+                id={fileInputId}
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handleInputChange}
-                className="hidden"
+                className="sr-only"
               />
-            </div>
+              <label
+                htmlFor={fileInputId}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                className="border-2 border-dashed border-charcoal/20 rounded-lg p-12 text-center hover:border-yarn-blue/50 transition-colors cursor-pointer bg-canvas-white block"
+              >
+                <Upload size={48} className="mx-auto mb-4 text-charcoal/30" />
+                <h3 className="text-lg font-semibold text-charcoal mb-2">
+                  Drag & drop an image here
+                </h3>
+                <p className="text-sm text-charcoal/60 mb-4">or click to browse</p>
+                <p className="text-xs text-charcoal/50">Supports: JPG, PNG, WebP</p>
+              </label>
+            </>
           ) : (
             <div style={{ backgroundColor: '#fff', border: '2px solid #333', borderRadius: '8px', padding: '16px' }}>
               {/* Image Preview with Zoom */}
@@ -259,15 +300,46 @@ export default function TextureScanner() {
                   ref={imageRef}
                   src={imageUrl}
                   alt="Uploaded crochet texture"
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
+                  style={{
+                    width: '100%',
+                    height: '100%',
                     objectFit: 'contain',
-                    transform: `scale(${zoom})`, 
-                    transformOrigin: 'center' 
+                    transform: `scale(${zoom})`,
+                    transformOrigin: 'center',
                   }}
                 />
+                <ActivationHeatmapOverlay
+                  heatmapUrl={heatmapUrl}
+                  visible={showHeatmap && !!heatmapUrl}
+                  zoom={zoom}
+                />
               </div>
+
+              <div className="flex flex-wrap items-center gap-3 mb-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const next = !showHeatmap
+                    setShowHeatmap(next)
+                    if (next && imageUrl && !heatmapUrl && imageRef.current) {
+                      await buildHeatmap(imageRef.current)
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-charcoal/20 hover:bg-charcoal/5 transition-colors"
+                  aria-pressed={showHeatmap}
+                >
+                  {showHeatmap ? <Eye size={14} /> : <EyeOff size={14} />}
+                  {showHeatmap ? 'Hide attention map' : 'Show attention map'}
+                </button>
+                {heatmapUrl && showHeatmap && (
+                  <span className="text-xs text-charcoal/50">
+                    Warmer colors = stronger neural activation
+                  </span>
+                )}
+              </div>
+              {heatmapError && (
+                <p className="text-xs text-amber-700 mb-2">{heatmapError}</p>
+              )}
 
               {/* Zoom Controls */}
               <div className="flex items-center justify-between mb-2">
@@ -423,6 +495,10 @@ export default function TextureScanner() {
           <li>Results show the top 3 predictions with confidence percentages</li>
           <li>Use zoom controls to examine image details</li>
           <li>Click &quot;Re-classify&quot; to analyze the image again</li>
+          <li>
+            The attention heatmap highlights regions the model focuses on (texture, edges,
+            patterns)
+          </li>
         </ul>
       </div>
     </div>
