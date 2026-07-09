@@ -14,6 +14,7 @@ import {
 import { Line } from 'react-chartjs-2'
 import { RotateCcw, Info } from 'lucide-react'
 import StitchDivider from '../shared/StitchDivider'
+import YarnSpinner from '../shared/YarnSpinner'
 import { generateDoilyData, calculateRuffleThreshold } from '../../utils/doilyMath'
 
 const Doily3D = lazy(() => import('./Doily3D'))
@@ -234,8 +235,8 @@ export default function DoilyGraph() {
                   className="flex items-center justify-center rounded-xl border border-charcoal/10 bg-charcoal/5"
                   style={{ minHeight: '280px' }}
                 >
-                  <div className="flex items-center gap-2 text-charcoal/60 text-sm">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yarn-blue" />
+                  <div className="flex items-center gap-2 text-yarn-blue text-sm">
+                    <YarnSpinner size={22} />
                     Loading 3D view…
                   </div>
                 </div>

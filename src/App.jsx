@@ -5,6 +5,7 @@ import DoilyGraph from './components/modules/DoilyGraph'
 import SquarePermutator from './components/modules/SquarePermutator'
 import ErrorBoundary from './components/shared/ErrorBoundary'
 import Manifesto from './components/shared/Manifesto'
+import YarnSpinner from './components/shared/YarnSpinner'
 
 // Lazy load TextureScanner to prevent blocking on initial load
 const TextureScanner = lazy(() => import('./components/modules/TextureScanner'))
@@ -24,9 +25,9 @@ function App() {
           <ErrorBoundary>
             <Suspense fallback={
               <div className="p-8">
-                <div className="flex items-center gap-2 text-charcoal/60">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yarn-blue"></div>
-                  <span>Loading Texture Recognition module...</span>
+                <div className="flex items-center gap-2 text-yarn-blue">
+                  <YarnSpinner size={28} />
+                  <span className="text-charcoal/60">Loading Texture Recognition module...</span>
                 </div>
               </div>
             }>

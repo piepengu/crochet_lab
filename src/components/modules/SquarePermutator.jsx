@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { RefreshCw, Grid3x3, Square, Grid, Download } from 'lucide-react'
 import StitchDivider from '../shared/StitchDivider'
+import YarnSpinner from '../shared/YarnSpinner'
 import {
   initializeGrid,
   generateValidPattern,
@@ -135,7 +136,7 @@ export default function SquarePermutator() {
 
             {/* Grid */}
             <div
-              className="mx-auto"
+              className="mx-auto cursor-hook"
               style={{
                 display: 'grid',
                 gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
@@ -155,7 +156,7 @@ export default function SquarePermutator() {
                       key={`${rowIndex}-${colIndex}`}
                       onClick={() => handleSquareClick(rowIndex, colIndex)}
                       className={`
-                        rounded-lg transition-all duration-200
+                        cursor-hook rounded-lg transition-all duration-200
                         ${color ? '' : 'bg-charcoal/5 border-2 border-dashed border-charcoal/20'}
                         ${isInvalid ? 'ring-2 ring-red-500 ring-offset-2' : ''}
                         hover:scale-105 hover:shadow-lg
@@ -214,7 +215,11 @@ export default function SquarePermutator() {
                 aria-label={isGenerating ? 'Generating pattern...' : 'Generate new pattern'}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-yarn-blue text-white rounded-lg hover:bg-yarn-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
               >
-                <RefreshCw size={18} className={isGenerating ? 'animate-spin' : ''} />
+                {isGenerating ? (
+                  <YarnSpinner size={18} className="text-white" />
+                ) : (
+                  <RefreshCw size={18} />
+                )}
                 {isGenerating ? 'Generating...' : 'Generate Pattern'}
               </button>
 
@@ -227,7 +232,11 @@ export default function SquarePermutator() {
                 }
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-charcoal/20 text-charcoal rounded-lg hover:bg-charcoal/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
               >
-                <Download size={18} className={isExporting ? 'animate-pulse' : ''} />
+                {isExporting ? (
+                  <YarnSpinner size={18} className="text-charcoal" />
+                ) : (
+                  <Download size={18} />
+                )}
                 {isExporting ? 'Creating PDF...' : 'Download Pattern PDF'}
               </button>
 
@@ -271,7 +280,7 @@ export default function SquarePermutator() {
                       newColors[index] = e.target.value
                       setColors(newColors)
                     }}
-                    className="flex-1 h-8 rounded cursor-pointer"
+                    className="flex-1 h-8 rounded cursor-hook"
                   />
                 </div>
               ))}

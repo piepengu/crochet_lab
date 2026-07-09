@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useId } from 'react'
-import { Upload, Loader2, X, ZoomIn, ZoomOut, RotateCcw, Eye, EyeOff } from 'lucide-react'
+import { Upload, X, ZoomIn, ZoomOut, RotateCcw, Eye, EyeOff } from 'lucide-react'
 import StitchDivider from '../shared/StitchDivider'
+import YarnSpinner from '../shared/YarnSpinner'
 import ActivationHeatmapOverlay from './ActivationHeatmapOverlay'
 import { useImageClassifier } from '../../hooks/useImageClassifier'
 
@@ -220,7 +221,7 @@ export default function TextureScanner() {
       {modelLoading && (
         <div className="mb-4 p-4 bg-yarn-blue/10 border border-yarn-blue/20 rounded-lg">
           <div className="flex items-center gap-2 text-yarn-blue">
-            <Loader2 size={20} className="animate-spin" />
+            <YarnSpinner size={22} />
             <span className="text-sm font-medium">Loading AI model...</span>
           </div>
         </div>
@@ -386,7 +387,7 @@ export default function TextureScanner() {
           {classifying && (
             <div className="p-4 bg-yarn-blue/10 border border-yarn-blue/20 rounded-lg">
               <div className="flex items-center gap-2 text-yarn-blue">
-                <Loader2 size={20} className="animate-spin" />
+                <YarnSpinner size={22} />
                 <span className="text-sm font-medium">Analyzing image...</span>
               </div>
             </div>
