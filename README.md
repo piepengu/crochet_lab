@@ -1,2 +1,1 @@
-# crochet_lab
-Crochet lab 
+An interactive, scientific dashboard built to explore the deep mathematical and algorithmic frameworks underlying traditional fiber crafts. By combining advanced web architecture with computational models, this lab visualizes non-Euclidean hyperbolic geometry through crochet topology, solves localized pattern constraints using backtracking graph-coloring algorithms, and deploys client-side computer vision models to classify stitch textures in real time.
