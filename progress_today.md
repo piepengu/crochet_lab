@@ -152,8 +152,13 @@ const { model, loading, error, classifyImage } = useImageClassifier()
 
 ## 🎯 Current Status
 
-**Upgrade Phase 2** ✅ | **Phase 3.2 PDF export** ✅ | **Phase 4.1 Explainable AI** ✅  
-**Next:** Phase 3.1 Stash Buster, or Phase 5 micro-interactions
+**Upgrade Phase 2** ✅ | **Phase 3.2 PDF export** ✅ | **Phase 4.1 Explainable AI** ✅ | **Phase 5.1 micro-interactions** ✅ | **Phase 3.1 Stash Buster** ✅  
+**Next:** Phase 5.2 power-user hotkeys, or Vite bundle splitting
+
+### CURSOR_UPGRADE_PLAN Phase 3.1 – Stash Buster ✅
+- ✅ `generateValidPattern` accepts `quantityConstraints` (max squares per color)
+- ✅ Prefers abundant yarn; rejects assignments that exceed stash
+- ✅ SquarePermutator: Limit yarn toggle, per-color max inputs, used/max distribution
 
 ---
 

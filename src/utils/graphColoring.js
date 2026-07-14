@@ -89,19 +89,82 @@ function shuffleArray(array) {
 }
 
 /**
+ * Whether a color still has stash remaining
+ * @param {Record<string, number>|null|undefined} quantityConstraints - max squares per color
+ * @param {Record<string, number>} usage - current counts
+ * @param {string} color
+ */
+export function hasStashRemaining(quantityConstraints, usage, color) {
+  if (!quantityConstraints || quantityConstraints[color] == null) return true
+  const max = quantityConstraints[color]
+  return (usage[color] || 0) < max
+}
+
+/**
+ * Check whether stash totals can cover the grid (null/undefined = unlimited for that color)
+ * @param {number} cellCount
+ * @param {Array<string>} colors
+ * @param {Record<string, number>|null|undefined} quantityConstraints
+ */
+export function isStashFeasible(cellCount, colors, quantityConstraints) {
+  if (!quantityConstraints) return true
+  let hasUnlimited = false
+  let capped = 0
+  for (const color of colors) {
+    const max = quantityConstraints[color]
+    if (max == null) {
+      hasUnlimited = true
+    } else {
+      capped += Math.max(0, max)
+    }
+  }
+  if (hasUnlimited) return true
+  return capped >= cellCount
+}
+
+/**
+ * Sort colors preferring those with more remaining stash (then random among ties)
+ */
+function orderColorsByStash(colors, quantityConstraints, usage) {
+  const shuffled = shuffleArray(colors)
+  if (!quantityConstraints) return shuffled
+
+  return shuffled.sort((a, b) => {
+    const limA = quantityConstraints[a]
+    const limB = quantityConstraints[b]
+    const remA = limA == null ? Infinity : limA - (usage[a] || 0)
+    const remB = limB == null ? Infinity : limB - (usage[b] || 0)
+    return remB - remA
+  })
+}
+
+/**
  * Generate a valid pattern using random assignment with retries
- * Uses a simple approach: randomly assign colors and check validity
- * 
+ *
  * @param {number} gridSize - Size of the grid (assumes square grid)
  * @param {Array<string>} colors - Array of available colors
  * @param {number} maxAttempts - Maximum number of attempts before giving up
+ * @param {Record<string, number>|null} [quantityConstraints] - max squares per color (Stash Buster)
  * @returns {{grid: Array<Array<string|null>>, attempts: number, success: boolean}}
  */
-export function generateValidPattern(gridSize, colors, maxAttempts = 1000) {
+export function generateValidPattern(
+  gridSize,
+  colors,
+  maxAttempts = 1000,
+  quantityConstraints = null
+) {
+  const cellCount = gridSize * gridSize
+  if (!isStashFeasible(cellCount, colors, quantityConstraints)) {
+    return {
+      grid: initializeGrid(gridSize, gridSize),
+      attempts: 0,
+      success: false,
+    }
+  }
+
   const grid = initializeGrid(gridSize, gridSize)
   let attempts = 0
 
-  // Create a flat array of all positions
   const positions = []
   for (let row = 0; row < gridSize; row++) {
     for (let col = 0; col < gridSize; col++) {
@@ -111,47 +174,42 @@ export function generateValidPattern(gridSize, colors, maxAttempts = 1000) {
 
   while (attempts < maxAttempts) {
     attempts++
-    
-    // Reset grid
+
     for (let row = 0; row < gridSize; row++) {
       for (let col = 0; col < gridSize; col++) {
         grid[row][col] = null
       }
     }
 
-    // Shuffle positions for random order
+    const usage = {}
     const shuffledPositions = shuffleArray(positions)
     let valid = true
 
-    // Try to assign colors to each position
     for (const { row, col } of shuffledPositions) {
-      // Shuffle colors for this position
-      const shuffledColors = shuffleArray(colors)
+      const candidates = orderColorsByStash(colors, quantityConstraints, usage)
       let assigned = false
 
-      // Try each color until we find a valid one
-      for (const color of shuffledColors) {
+      for (const color of candidates) {
+        if (!hasStashRemaining(quantityConstraints, usage, color)) continue
         if (isValidColoring(grid, row, col, color)) {
           grid[row][col] = color
+          usage[color] = (usage[color] || 0) + 1
           assigned = true
           break
         }
       }
 
-      // If we couldn't assign a valid color, this attempt failed
       if (!assigned) {
         valid = false
         break
       }
     }
 
-    // If we successfully assigned all colors, return success
     if (valid && isGridValid(grid)) {
       return { grid, attempts, success: true }
     }
   }
 
-  // If we exhausted all attempts, return failure
   return { grid, attempts, success: false }
 }
 

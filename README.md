@@ -90,6 +90,6 @@ src/
 - [x] PDF pattern export
 - [x] Explainable AI heatmaps
 - [x] Micro-interactions (hook cursor, yarn spinners)
-- [ ] Stash Buster — yarn quantity constraints in pattern generation
+- [x] Stash Buster — yarn quantity constraints in pattern generation
 - [ ] Power-user hotkeys (`Space`, `R`, `1`–`3`)
 - [ ] Vite bundle splitting for faster first load
