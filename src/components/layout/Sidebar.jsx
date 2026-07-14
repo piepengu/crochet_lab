@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Circle, Grid3x3, Scan, FileText, Menu, X } from 'lucide-react'
 import clsx from 'clsx'
+import BrandMark from '../shared/BrandMark'
 
 const navigationItems = [
   {
@@ -39,65 +40,90 @@ export default function Sidebar({ activeModule, onModuleChange }) {
 
   return (
     <>
-      {/* Mobile menu button */}
-      <button
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="fixed top-3 left-3 z-[100] lg:hidden p-2.5 rounded-lg bg-charcoal text-canvas-white shadow-md hover:bg-charcoal/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
-        aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
-        aria-expanded={isMobileOpen}
-      >
-        {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
+      {/* Mobile top bar — brand always visible */}
+      <div className="lg:hidden sticky top-0 z-[90] flex items-center gap-3 px-3 py-3 bg-gradient-to-r from-[#eef3f8] to-white border-b border-charcoal/10">
+        <button
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="shrink-0 p-2.5 rounded-lg bg-charcoal text-canvas-white shadow-md hover:bg-charcoal/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+          aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isMobileOpen}
+        >
+          {isMobileOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+        <div className="min-w-0 flex-1">
+          <BrandMark compact titleAs="h1" />
+        </div>
+      </div>
 
-      {/* Sidebar - horizontal nav on desktop, slide-out on mobile */}
       <aside
         aria-label="Main navigation"
         className={clsx(
-          'fixed top-0 left-0 h-full bg-white/95 backdrop-blur-sm border-r border-charcoal/10 z-50 transition-transform duration-300 ease-in-out shadow-sm',
-          'lg:translate-x-0 lg:sticky lg:top-0 lg:z-50 lg:w-full lg:h-auto lg:max-h-none lg:border-r-0 lg:border-b lg:shadow-md',
+          'fixed top-0 left-0 h-full z-50 transition-transform duration-300 ease-in-out',
+          'bg-gradient-to-b from-white via-white to-[#f3f6fa]',
+          'border-r border-charcoal/10 shadow-sm',
+          'lg:translate-x-0 lg:sticky lg:top-0 lg:z-50 lg:w-full lg:h-auto lg:max-h-none',
+          'lg:border-r-0 lg:border-b lg:shadow-[0_1px_0_rgba(26,26,26,0.06)]',
+          'lg:bg-gradient-to-r lg:from-[#eef3f8] lg:via-white lg:to-white',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-          'w-72 flex flex-col lg:flex-row lg:items-center lg:justify-between lg:px-6 lg:py-3 shrink-0'
+          'w-[19rem] flex flex-col lg:flex-row lg:items-center lg:justify-between lg:px-6 lg:py-4 shrink-0'
         )}
       >
-        {/* Logo/Title */}
-        <div className="p-6 border-b border-charcoal/10 bg-charcoal/[0.02] lg:border-b-0 lg:border-r lg:border-charcoal/10 lg:pr-6 lg:py-0">
-          <h1 className="font-display text-2xl font-normal text-charcoal tracking-tight">The Algorithmic Loop</h1>
-          <p className="text-xs text-charcoal/50 mt-1 tracking-wide uppercase">Computational Crochet Lab</p>
+        {/* Desktop brand */}
+        <div className="hidden lg:block lg:border-r lg:border-charcoal/10 lg:pr-7 lg:py-1 lg:min-w-[300px]">
+          <BrandMark compact titleAs="h1" />
         </div>
 
-        {/* Navigation - horizontal row on desktop */}
-        <nav className="flex-1 overflow-y-auto p-4 lg:flex-1 lg:overflow-visible lg:p-0 lg:pl-6" aria-label="Module navigation">
-          <ul className="flex flex-col gap-2 list-none lg:flex-row lg:gap-3 lg:flex-1 lg:justify-end">
+        {/* Mobile drawer header */}
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-charcoal/10">
+          <p className="font-mono text-[10px] tracking-[0.18em] uppercase text-charcoal/45">
+            Modules
+          </p>
+          <button
+            onClick={() => setIsMobileOpen(false)}
+            className="p-2 rounded-lg text-charcoal/60 hover:bg-charcoal/5"
+            aria-label="Close menu"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <nav
+          className="flex-1 overflow-y-auto p-4 lg:flex-1 lg:overflow-visible lg:p-0 lg:pl-6"
+          aria-label="Module navigation"
+        >
+          <ul className="flex flex-col gap-2 list-none lg:flex-row lg:gap-2.5 lg:flex-1 lg:justify-end">
             {navigationItems.map((item) => {
               const Icon = item.icon
               const isActive = activeModule === item.id
 
               return (
-                <li key={item.id} className="lg:flex-1 lg:max-w-[180px]">
+                <li key={item.id} className="lg:flex-1 lg:max-w-[168px]">
                   <button
                     onClick={() => handleNavClick(item.id)}
                     aria-current={isActive ? 'page' : undefined}
                     className={clsx(
-                      'w-full flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-200 text-center lg:flex-row lg:justify-center lg:gap-2 lg:py-3 lg:px-4',
-                      'hover:bg-charcoal/5',
+                      'w-full flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-200 text-center',
+                      'lg:flex-row lg:justify-center lg:gap-2 lg:py-2.5 lg:px-3',
                       isActive
-                        ? 'bg-yarn-blue/20 text-yarn-blue font-semibold ring-2 ring-yarn-blue/50 shadow-sm'
-                        : 'bg-charcoal/[0.04] text-charcoal/70 hover:text-charcoal hover:bg-charcoal/[0.08] border border-charcoal/10'
+                        ? 'bg-yarn-blue text-white'
+                        : 'bg-white/70 text-charcoal/70 border border-charcoal/10 hover:border-charcoal/20 hover:text-charcoal hover:bg-white'
                     )}
                   >
                     <Icon
-                      size={24}
+                      size={22}
                       className={clsx(
-                        'flex-shrink-0 lg:w-5 lg:h-5',
-                        isActive ? 'text-yarn-blue' : 'text-charcoal/50'
+                        'flex-shrink-0 lg:w-[18px] lg:h-[18px]',
+                        isActive ? 'text-white' : 'text-yarn-blue/80'
                       )}
                     />
                     <div className="min-w-0">
                       <div className="font-medium text-sm leading-tight">{item.label}</div>
-                      <div className={clsx(
-                        'text-xs mt-0.5 line-clamp-2 lg:sr-only',
-                        isActive ? 'text-yarn-blue/80' : 'text-charcoal/50'
-                      )}>
+                      <div
+                        className={clsx(
+                          'text-xs mt-0.5 line-clamp-2 lg:sr-only',
+                          isActive ? 'text-white/85' : 'text-charcoal/50'
+                        )}
+                      >
                         {item.description}
                       </div>
                     </div>
@@ -109,7 +135,6 @@ export default function Sidebar({ activeModule, onModuleChange }) {
         </nav>
       </aside>
 
-      {/* Mobile overlay */}
       {isMobileOpen && (
         <div
           className="fixed inset-0 bg-charcoal/50 z-40 lg:hidden"

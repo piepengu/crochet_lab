@@ -1,6 +1,6 @@
 # The Algorithmic Loop
 
-**Computational Crochet Lab** — an interactive dashboard exploring the mathematics, algorithms, and computer vision behind fiber craft.
+**Where craft meets computation** — an interactive lab exploring the mathematics, algorithms, and computer vision behind fiber craft.
 
 [Live demo](https://crochet-lab.vercel.app/) · [Source](https://github.com/piepengu/crochet_lab)
 
