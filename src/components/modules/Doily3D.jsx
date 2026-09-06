@@ -74,7 +74,7 @@ function DoilyMesh({ multiplier, maxRows, baseStitches }) {
   )
 }
 
-function Scene({ multiplier, maxRows, baseStitches }) {
+function Scene({ multiplier, maxRows, baseStitches, autoRotate, onInteractionStart }) {
   return (
     <>
       <color attach="background" args={['#eef2f6']} />
@@ -89,6 +89,9 @@ function Scene({ multiplier, maxRows, baseStitches }) {
         maxDistance={10}
         minPolarAngle={0.15}
         maxPolarAngle={Math.PI / 2 + 0.45}
+        autoRotate={autoRotate}
+        autoRotateSpeed={0.9}
+        onStart={onInteractionStart}
       />
     </>
   )
@@ -102,12 +105,13 @@ export default function Doily3D({
   className = '',
 }) {
   const labelMultiplier = displayMultiplier ?? multiplier
+  const [autoRotate, setAutoRotate] = useState(true)
 
   return (
     <div
       className={`relative z-0 isolate rounded-xl border border-charcoal/10 overflow-hidden bg-[#eef2f6] ${className}`}
       role="img"
-      aria-label={`3D lace doily at growth multiplier ${labelMultiplier.toFixed(2)}. Drag to rotate. Blue rings stay flatter; green outer rings show ruffle from excess stitches.`}
+      aria-label={`3D lace doily at growth multiplier ${labelMultiplier.toFixed(2)}. Auto-rotating; drag to take control. Blue rings stay flatter; green outer rings show ruffle from excess stitches.`}
     >
       <div className="relative z-0 w-full h-[220px] sm:h-[260px] md:h-[min(320px,36vh)] max-h-[360px]">
         <Canvas
@@ -121,11 +125,14 @@ export default function Doily3D({
             multiplier={multiplier}
             maxRows={maxRows}
             baseStitches={baseStitches}
+            autoRotate={autoRotate}
+            onInteractionStart={() => setAutoRotate(false)}
           />
         </Canvas>
       </div>
       <p className="px-3 py-2 text-center text-[11px] text-charcoal/55 font-mono border-t border-charcoal/10 bg-white/50">
-        Drag to rotate · lace rings · blue→green as ruffle grows · ×{labelMultiplier.toFixed(2)}
+        {autoRotate ? 'Auto-spinning' : 'Drag to rotate'} · lace rings · blue→green · ×
+        {labelMultiplier.toFixed(2)}
       </p>
     </div>
   )

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Circle, Grid3x3, Scan, Sparkles, GraduationCap, HeartHandshake, Brain } from 'lucide-react'
+import { Sparkles, GraduationCap, HeartHandshake, Brain } from 'lucide-react'
 import StitchDivider from './StitchDivider'
 
 const IMPACT = [
@@ -23,95 +23,160 @@ const IMPACT = [
 const MODULES = [
   {
     id: 'doily',
-    icon: Circle,
     title: 'Radial Topology',
     blurb: 'Grow stitches, watch a surface ruffle in 3D.',
+    image: '/images/doily-radial-beige.jpg',
+    alt: 'Radial crochet doily',
   },
   {
     id: 'squares',
-    icon: Grid3x3,
     title: 'Modular Permutations',
     blurb: 'Graph coloring + Stash Buster + PDF export.',
+    image: '/images/granny-squares-source.jpg',
+    alt: 'Colorful granny square crochet',
   },
   {
     id: 'texture',
-    icon: Scan,
     title: 'Texture Recognition',
     blurb: 'Classify fabric and see attention hotspots.',
+    image: '/images/texture-mesh.jpg',
+    alt: 'Crochet mesh texture close-up',
   },
 ]
 
 /**
- * Landing: impact story + clear paths into each module
+ * Visual landing: craft hero + photo paths into each module
  */
 export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
   return (
-    <div className="relative overflow-hidden">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-40"
-        style={{
-          background:
-            'radial-gradient(ellipse 80% 50% at 10% 0%, rgba(74,144,226,0.18), transparent 55%), radial-gradient(ellipse 60% 40% at 90% 10%, rgba(46,204,113,0.08), transparent 50%)',
-        }}
-        aria-hidden
-      />
+    <div className="relative">
+      {/* Full-bleed craft hero — one composition */}
+      <section className="relative isolate min-h-[min(92dvh,880px)] w-full overflow-hidden">
+        <motion.img
+          src="/images/hero-bag-brown.jpg"
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover object-[center_30%]"
+          initial={{ scale: 1.08 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(105deg, rgba(250,250,250,0.94) 0%, rgba(250,250,250,0.78) 38%, rgba(250,250,250,0.28) 62%, rgba(26,26,26,0.22) 100%)',
+          }}
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.35] mix-blend-multiply"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 20% 20%, transparent 0, transparent 55%, rgba(26,26,26,0.08) 100%)',
+          }}
+          aria-hidden
+        />
+
+        <div className="relative z-10 flex min-h-[min(92dvh,880px)] flex-col justify-end lg:justify-center px-5 sm:px-8 lg:px-12 pb-14 pt-10 lg:pb-20 max-w-7xl mx-auto w-full">
+          <motion.div
+            className="max-w-xl"
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-yarn-blue mb-3">
+              Computational Crochet Lab
+            </p>
+            <h2 className="font-display text-[2.75rem] sm:text-5xl lg:text-6xl text-charcoal leading-[0.95] tracking-tight mb-4">
+              <span className="block font-normal">The Algorithmic</span>
+              <span className="block italic text-yarn-blue">Loop</span>
+            </h2>
+            <p className="font-display italic text-charcoal/60 text-lg mb-5">
+              Where craft meets computation
+            </p>
+            <p className="text-charcoal/70 text-base sm:text-lg leading-relaxed mb-2 max-w-md">
+              Math you can hold. Code you can crochet.
+            </p>
+            <p className="text-sm text-charcoal/50 mb-7">
+              Created by <span className="font-semibold text-charcoal/70">Jason Zlatinski</span>
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <motion.button
+                type="button"
+                onClick={() => onNavigate('doily')}
+                className="px-6 py-3 rounded-lg bg-yarn-blue text-white font-medium text-sm hover:bg-yarn-blue/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Enter the lab
+              </motion.button>
+              <button
+                type="button"
+                onClick={() => onNavigate('squares')}
+                className="px-6 py-3 rounded-lg border border-charcoal/20 bg-white/70 backdrop-blur-sm text-charcoal text-sm font-medium hover:bg-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+              >
+                See patterns
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
       <div className="relative p-4 lg:p-8 max-w-5xl mx-auto">
-        <motion.header
-          className="mb-10 lg:mb-14"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-yarn-blue mb-3">
-            STEM × Craft · Interactive Lab
-          </p>
-          <p className="text-sm text-charcoal/55 mb-3">
-            Created by <span className="font-semibold text-charcoal">Jason Zlatinski</span>
-          </p>
-          <h2 className="font-display text-4xl lg:text-5xl text-charcoal leading-[1.05] mb-4">
-            Math you can hold.
-            <span className="block italic text-yarn-blue">Code you can crochet.</span>
-          </h2>
-          <p className="text-charcoal/65 text-base lg:text-lg max-w-2xl leading-relaxed">
-            The Algorithmic Loop is an interactive lab that makes advanced computer science
-            visible through fiber craft—so students, makers, and audiences can see algorithms,
-            geometry, and explainable AI without a textbook gatekeeper.
-          </p>
-
-          <div className="mt-6 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => onNavigate('doily')}
-              className="px-5 py-2.5 rounded-lg bg-yarn-blue text-white font-medium text-sm hover:bg-yarn-blue/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
-            >
-              Start with 3D geometry
-            </button>
-            <button
-              type="button"
-              onClick={() => onToggleDemo(!demoMode)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-charcoal/15 bg-white text-charcoal text-sm font-medium hover:bg-charcoal/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
-            >
-              <Sparkles size={16} className="text-yarn-blue" />
-              {demoMode ? 'Demo Mode on' : 'Enable Demo Mode'}
-            </button>
+        {/* Photo module covers */}
+        <section className="mb-14 -mt-2 lg:mt-4">
+          <motion.h3
+            className="font-display text-2xl sm:text-3xl text-charcoal mb-2"
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.45 }}
+          >
+            Explore the lab
+          </motion.h3>
+          <StitchDivider color="rgba(26,26,26,0.12)" height={14} segmentCount={8} className="mb-6" />
+          <div className="grid gap-4 sm:grid-cols-3">
+            {MODULES.map(({ id, title, blurb, image, alt }, index) => (
+              <motion.button
+                key={id}
+                type="button"
+                onClick={() => onNavigate(id)}
+                className="group text-left overflow-hidden rounded-xl border border-charcoal/10 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-30px' }}
+                transition={{ duration: 0.45, delay: index * 0.08 }}
+                whileHover={{ y: -3 }}
+              >
+                <div className="relative aspect-[4/3] overflow-hidden bg-charcoal/5">
+                  <img
+                    src={image}
+                    alt={alt}
+                    className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                    loading="lazy"
+                  />
+                  <div
+                    className="absolute inset-0 bg-gradient-to-t from-charcoal/55 via-transparent to-transparent opacity-90"
+                    aria-hidden
+                  />
+                  <span className="absolute bottom-3 left-3 right-3 font-display text-lg text-white leading-tight drop-shadow-sm">
+                    {title}
+                  </span>
+                </div>
+                <p className="px-4 py-3 text-xs text-charcoal/55 leading-relaxed">{blurb}</p>
+              </motion.button>
+            ))}
           </div>
-          <p className="mt-3 text-xs text-charcoal/50 max-w-xl">
-            Demo Mode keeps Texture Recognition on fast mock predictions—ideal for presentations
-            and judging. Turn it off anytime to run the real on-device MobileNet model.
-          </p>
-        </motion.header>
+        </section>
 
         <section className="mb-12">
           <h3 className="font-display text-2xl text-charcoal mb-2">Who it helps</h3>
           <StitchDivider color="rgba(26,26,26,0.12)" height={14} segmentCount={8} className="mb-6" />
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-3">
             {IMPACT.map(({ icon: Icon, title, body }) => (
-              <div
-                key={title}
-                className="rounded-xl border border-charcoal/10 bg-white/80 p-5 shadow-sm"
-              >
-                <Icon size={22} className="text-yarn-blue mb-3" aria-hidden />
+              <div key={title} className="border-l-2 border-yarn-blue/30 pl-4 py-1">
+                <Icon size={20} className="text-yarn-blue mb-2" aria-hidden />
                 <h4 className="font-semibold text-charcoal mb-2">{title}</h4>
                 <p className="text-sm text-charcoal/60 leading-relaxed">{body}</p>
               </div>
@@ -119,41 +184,22 @@ export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
           </div>
         </section>
 
-        <section className="mb-12">
-          <h3 className="font-display text-2xl text-charcoal mb-2">Explore the lab</h3>
-          <StitchDivider color="rgba(26,26,26,0.12)" height={14} segmentCount={8} className="mb-6" />
-          <div className="grid gap-3 sm:grid-cols-3">
-            {MODULES.map(({ id, icon: Icon, title, blurb }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => onNavigate(id)}
-                className="text-left rounded-xl border border-charcoal/10 bg-white/90 p-5 hover:border-yarn-blue/40 hover:bg-yarn-blue/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
-              >
-                <Icon size={20} className="text-yarn-blue mb-2" aria-hidden />
-                <div className="font-semibold text-charcoal mb-1">{title}</div>
-                <p className="text-xs text-charcoal/55 leading-relaxed">{blurb}</p>
-              </button>
-            ))}
+        <section className="mb-10 flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-charcoal/10 bg-charcoal/[0.03] p-5">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-display text-xl text-charcoal mb-1">Demo Mode</h3>
+            <p className="text-sm text-charcoal/60 leading-relaxed">
+              Keeps Texture Recognition on fast mock predictions—ideal for presentations. Turn
+              it off anytime to run the real on-device MobileNet model.
+            </p>
           </div>
-        </section>
-
-        <section className="rounded-xl border border-charcoal/10 bg-charcoal/[0.03] p-5 lg:p-6 mb-10">
-          <h3 className="font-display text-xl text-charcoal mb-2">What you&apos;ll see in a demo</h3>
-          <ol className="text-sm text-charcoal/65 space-y-2 list-decimal list-inside leading-relaxed">
-            <li>
-              <strong className="text-charcoal">Radial Topology</strong> — raise the growth
-              multiplier and watch hyperbolic ruffles appear in 3D.
-            </li>
-            <li>
-              <strong className="text-charcoal">Modular Permutations</strong> — generate a valid
-              coloring, enable Stash Buster, download a pattern PDF.
-            </li>
-            <li>
-              <strong className="text-charcoal">Texture Recognition</strong> — upload an image,
-              read predictions, toggle the attention heatmap.
-            </li>
-          </ol>
+          <button
+            type="button"
+            onClick={() => onToggleDemo(!demoMode)}
+            className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-charcoal/15 bg-white text-charcoal text-sm font-medium hover:bg-charcoal/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+          >
+            <Sparkles size={16} className="text-yarn-blue" />
+            {demoMode ? 'Demo Mode on' : 'Enable Demo Mode'}
+          </button>
         </section>
 
         <footer className="border-t border-charcoal/10 pt-6 pb-2 text-sm text-charcoal/55">
