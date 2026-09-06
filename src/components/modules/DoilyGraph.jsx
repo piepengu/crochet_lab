@@ -519,18 +519,18 @@ export default function DoilyGraph() {
         <div className="grid md:grid-cols-[minmax(0,200px)_1fr]">
           <div className="relative min-h-[140px] md:min-h-full bg-charcoal/5">
             <img
-              src="/images/doily-white-complex.jpg"
-              alt="Hand-crocheted lace inspired by gifts from a friend"
-              className="absolute inset-0 w-full h-full object-cover"
+              src="/images/texture-mesh.jpg"
+              alt="Crocheted mesh texture from gifts that inspired CrochetLab"
+              className="absolute inset-0 w-full h-full object-cover object-center"
               loading="lazy"
             />
           </div>
           <div className="p-5 lg:p-6">
             <h3 className="font-display text-xl text-charcoal mb-2">Inspiration</h3>
             <p className="text-sm text-charcoal/65 leading-relaxed max-w-2xl">
-              Inspired by crocheted dolls, scarves, and hats gifted by a friend, CrochetLab asks
-              how simple loops can generate complex mathematical forms—and whether code can help
-              makers explore those forms before picking up a hook.
+              Inspired by crocheted dolls, scarves, hats, and bags gifted by a friend, CrochetLab
+              asks how simple loops can generate complex mathematical forms—and whether code can
+              help makers explore those forms before picking up a hook.
             </p>
           </div>
         </div>
