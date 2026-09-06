@@ -44,8 +44,11 @@ export default function Manifesto() {
           >
             The Human Algorithm
           </h1>
-          <p className="text-lg text-charcoal/60 italic">
+          <p className="text-lg text-charcoal/60 italic mb-3">
             Where loops meet logic, and stitches become data
+          </p>
+          <p className="text-sm text-charcoal/55">
+            By <span className="font-semibold text-charcoal">Jason Zlatinski</span>
           </p>
         </motion.header>
 
@@ -245,8 +248,13 @@ export default function Manifesto() {
           <div className="mb-8">
             <StitchDivider color="rgba(26,26,26,0.2)" strokeWidth={1.5} />
           </div>
-          <p className="text-charcoal/60 mb-4 flex items-center justify-center gap-2">
+          <p className="text-charcoal/60 mb-2 flex items-center justify-center gap-2">
             Made with <Heart size={16} className="text-red-500 fill-red-500" /> and yarn
+          </p>
+          <p className="text-sm text-charcoal/70 mb-4">
+            Created by <span className="font-semibold text-charcoal">Jason Zlatinski</span>
+            {' · '}
+            Congressional App Challenge
           </p>
           <div className="flex justify-center gap-6">
             <a
@@ -259,11 +267,13 @@ export default function Manifesto() {
               <span className="text-sm">View Source</span>
             </a>
             <a
-              href="#"
+              href="https://github.com/piepengu"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 text-charcoal/60 hover:text-yarn-blue transition-colors"
             >
               <ExternalLink size={20} />
-              <span className="text-sm">Portfolio</span>
+              <span className="text-sm">GitHub Profile</span>
             </a>
           </div>
         </motion.footer>

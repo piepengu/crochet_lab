@@ -66,6 +66,9 @@ export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
           <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-yarn-blue mb-3">
             Congressional App Challenge · STEM × Craft
           </p>
+          <p className="text-sm text-charcoal/55 mb-3">
+            Created by <span className="font-semibold text-charcoal">Jason Zlatinski</span>
+          </p>
           <h2 className="font-display text-4xl lg:text-5xl text-charcoal leading-[1.05] mb-4">
             Math you can hold.
             <span className="block italic text-yarn-blue">Code you can crochet.</span>
@@ -135,7 +138,7 @@ export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
           </div>
         </section>
 
-        <section className="rounded-xl border border-charcoal/10 bg-charcoal/[0.03] p-5 lg:p-6">
+        <section className="rounded-xl border border-charcoal/10 bg-charcoal/[0.03] p-5 lg:p-6 mb-10">
           <h3 className="font-display text-xl text-charcoal mb-2">What you&apos;ll see in a demo</h3>
           <ol className="text-sm text-charcoal/65 space-y-2 list-decimal list-inside leading-relaxed">
             <li>
@@ -152,6 +155,26 @@ export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
             </li>
           </ol>
         </section>
+
+        <footer className="border-t border-charcoal/10 pt-6 pb-2 text-sm text-charcoal/55">
+          <p>
+            <span className="font-semibold text-charcoal">Jason Zlatinski</span>
+            {' · '}
+            The Algorithmic Loop
+            {' · '}
+            Congressional App Challenge
+          </p>
+          <p className="mt-1 text-xs text-charcoal/40">
+            <a
+              href="https://github.com/piepengu/crochet_lab"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-yarn-blue transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue rounded"
+            >
+              github.com/piepengu/crochet_lab
+            </a>
+          </p>
+        </footer>
       </div>
     </div>
   )
