@@ -15,36 +15,61 @@ function DoilyMesh({ multiplier, maxRows, baseStitches }) {
     setTick((t) => t + 1)
   }, [])
 
-  const prevGeo = useRef(null)
+  const prevSurface = useRef(null)
+  const prevLace = useRef(null)
 
-  const geometry = useMemo(() => {
-    prevGeo.current?.dispose()
-    const { positions, indices } = generateDoilyMeshGeometry({
-      maxRows,
-      multiplier,
-      baseStitches,
-    })
-    const geo = new THREE.BufferGeometry()
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
-    geo.setIndex(Array.from(indices))
-    geo.computeVertexNormals()
-    prevGeo.current = geo
-    return geo
+  const { surface, lace } = useMemo(() => {
+    prevSurface.current?.dispose()
+    prevLace.current?.dispose()
+
+    const { positions, indices, colors, lacePositions, laceColors } =
+      generateDoilyMeshGeometry({
+        maxRows,
+        multiplier,
+        baseStitches,
+      })
+
+    const surfaceGeo = new THREE.BufferGeometry()
+    surfaceGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+    surfaceGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3))
+    surfaceGeo.setIndex(Array.from(indices))
+    surfaceGeo.computeVertexNormals()
+
+    const laceGeo = new THREE.BufferGeometry()
+    laceGeo.setAttribute('position', new THREE.Float32BufferAttribute(lacePositions, 3))
+    laceGeo.setAttribute('color', new THREE.Float32BufferAttribute(laceColors, 3))
+
+    prevSurface.current = surfaceGeo
+    prevLace.current = laceGeo
+    return { surface: surfaceGeo, lace: laceGeo }
   }, [multiplier, maxRows, baseStitches, tick])
 
-  useEffect(() => () => prevGeo.current?.dispose(), [])
+  useEffect(
+    () => () => {
+      prevSurface.current?.dispose()
+      prevLace.current?.dispose()
+    },
+    []
+  )
 
   return (
-    <Bounds fit clip observe margin={1.15}>
-      <mesh geometry={geometry}>
-        <meshStandardMaterial
-          color="#4A90E2"
-          roughness={0.4}
-          metalness={0.05}
-          flatShading
-          side={DoubleSide}
-        />
-      </mesh>
+    <Bounds fit clip observe margin={1.2}>
+      <group>
+        <mesh geometry={surface}>
+          <meshStandardMaterial
+            vertexColors
+            roughness={0.55}
+            metalness={0.02}
+            transparent
+            opacity={0.38}
+            side={DoubleSide}
+            depthWrite={false}
+          />
+        </mesh>
+        <lineSegments geometry={lace}>
+          <lineBasicMaterial vertexColors transparent opacity={0.95} />
+        </lineSegments>
+      </group>
     </Bounds>
   )
 }
@@ -53,17 +78,17 @@ function Scene({ multiplier, maxRows, baseStitches }) {
   return (
     <>
       <color attach="background" args={['#eef2f6']} />
-      <ambientLight intensity={0.65} />
-      <directionalLight position={[5, 8, 4]} intensity={1} />
-      <directionalLight position={[-4, 3, -3]} intensity={0.35} />
+      <ambientLight intensity={0.7} />
+      <directionalLight position={[5, 8, 4]} intensity={1.05} />
+      <directionalLight position={[-4, 3, -3]} intensity={0.4} />
       <DoilyMesh multiplier={multiplier} maxRows={maxRows} baseStitches={baseStitches} />
       <OrbitControls
         makeDefault
         enablePan={false}
         minDistance={1}
         maxDistance={10}
-        minPolarAngle={0.1}
-        maxPolarAngle={Math.PI / 2 + 0.4}
+        minPolarAngle={0.15}
+        maxPolarAngle={Math.PI / 2 + 0.45}
       />
     </>
   )
@@ -82,12 +107,12 @@ export default function Doily3D({
     <div
       className={`relative z-0 isolate rounded-xl border border-charcoal/10 overflow-hidden bg-[#eef2f6] ${className}`}
       role="img"
-      aria-label={`3D doily surface at growth multiplier ${labelMultiplier.toFixed(2)}. Drag to rotate.`}
+      aria-label={`3D lace doily at growth multiplier ${labelMultiplier.toFixed(2)}. Drag to rotate. Blue rings stay flatter; green outer rings show ruffle from excess stitches.`}
     >
       <div className="relative z-0 w-full h-[220px] sm:h-[260px] md:h-[min(320px,36vh)] max-h-[360px]">
         <Canvas
           className="!relative touch-none"
-          camera={{ position: [0, 2.5, 3.5], fov: 45, near: 0.1, far: 100 }}
+          camera={{ position: [2.4, 1.9, 2.9], fov: 42, near: 0.1, far: 100 }}
           gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
           dpr={[1, 2]}
           style={{ width: '100%', height: '100%', display: 'block' }}
@@ -100,7 +125,7 @@ export default function Doily3D({
         </Canvas>
       </div>
       <p className="px-3 py-2 text-center text-[11px] text-charcoal/55 font-mono border-t border-charcoal/10 bg-white/50">
-        Drag to rotate · multiplier {labelMultiplier.toFixed(2)}
+        Drag to rotate · lace rings · blue→green as ruffle grows · ×{labelMultiplier.toFixed(2)}
       </p>
     </div>
   )

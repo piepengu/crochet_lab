@@ -282,8 +282,8 @@ export default function DoilyGraph() {
           <div className="text-sm text-charcoal/70 space-y-2">
             <p>
               <strong>Mathematical Insight:</strong> When stitch count grows linearly (multiplier = 1.0),
-              the crochet remains flat. As the multiplier increases, exponential growth creates hyperbolic
-              ruffles—a beautiful demonstration of non-Euclidean geometry in fiber arts.
+              the lace stays flat. Raise the multiplier and excess stitches buckle into hyperbolic
+              ruffles—rings shift blue→green as “too much yarn for the circle” grows.
             </p>
             {ruffleThreshold && (
               <p className="text-accent-green font-semibold">
@@ -344,6 +344,30 @@ export default function DoilyGraph() {
               <span>0.80 (Flat)</span>
               <span>1.00 (Linear)</span>
               <span>1.50 (Ruffled)</span>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-3" role="group" aria-label="Growth formula presets">
+              {[
+                { label: 'Flat', value: 1.0 },
+                { label: 'Mild ruffle', value: 1.2 },
+                { label: 'Hyperbolic', value: 1.45 },
+              ].map((preset) => {
+                const active = Math.abs(multiplier - preset.value) < 0.001
+                return (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => setMultiplier(preset.value)}
+                    className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue ${
+                      active
+                        ? 'bg-yarn-blue text-white border-yarn-blue'
+                        : 'bg-white text-charcoal/80 border-charcoal/15 hover:border-yarn-blue/40'
+                    }`}
+                    aria-pressed={active}
+                  >
+                    {preset.label} · {preset.value.toFixed(2)}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
