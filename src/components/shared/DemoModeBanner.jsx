@@ -1,7 +1,8 @@
 import { Sparkles, X } from 'lucide-react'
 
 /**
- * Persistent banner when Demo Mode is active (CAC / presentation reliability)
+ * Compact Demo Mode notice — only shown where it matters (Texture Recognition)
+ * so other modules stay screenshot/video clean.
  */
 export default function DemoModeBanner({ enabled, onDisable }) {
   if (!enabled) return null
@@ -9,27 +10,23 @@ export default function DemoModeBanner({ enabled, onDisable }) {
   return (
     <div
       role="status"
-      className="relative z-[60] flex flex-wrap items-center justify-between gap-2 px-4 py-2 bg-yarn-blue text-white text-sm"
+      className="relative z-[60] flex items-center justify-between gap-3 px-3 py-1.5 border-b border-yarn-blue/20 bg-yarn-blue/[0.07] text-charcoal text-xs sm:text-sm"
     >
       <div className="flex items-center gap-2 min-w-0">
-        <Sparkles size={16} className="shrink-0 opacity-90" aria-hidden />
-        <p className="leading-snug">
-          <strong className="font-semibold">Demo Mode</strong>
-          <span className="opacity-90">
-            {' '}
-            — Texture Recognition uses fast mock results for reliable presentations. Live MobileNet
-            stays available when you turn this off.
-          </span>
+        <Sparkles size={14} className="shrink-0 text-yarn-blue" aria-hidden />
+        <p className="leading-snug text-charcoal/75">
+          <span className="font-semibold text-charcoal">Demo Mode</span>
+          <span className="hidden sm:inline"> — mock Texture results for reliable demos</span>
         </p>
       </div>
       <button
         type="button"
         onClick={onDisable}
-        className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/15 hover:bg-white/25 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-charcoal/10 bg-white/80 hover:bg-white text-[11px] font-medium text-charcoal/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue"
         aria-label="Turn off Demo Mode"
       >
-        <X size={14} />
-        Turn off
+        <X size={12} />
+        Off
       </button>
     </div>
   )

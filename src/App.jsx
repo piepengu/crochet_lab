@@ -58,7 +58,10 @@ function App() {
   return (
     <div className="min-h-screen bg-canvas-white flex flex-col">
       <Sidebar activeModule={activeModule} onModuleChange={setActiveModule} />
-      <DemoModeBanner enabled={demoMode} onDisable={() => setDemoMode(false)} />
+      <DemoModeBanner
+        enabled={demoMode && activeModule === 'texture'}
+        onDisable={() => setDemoMode(false)}
+      />
 
       <main
         id="main-content"

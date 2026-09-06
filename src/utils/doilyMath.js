@@ -102,6 +102,45 @@ export function getAdjustedStitches(row, multiplier = 1.0, baseStitches = 6) {
   return linear + (exponential - linear) * blend
 }
 
+/**
+ * Human-readable surface type from growth multiplier
+ * @returns {'Flat' | 'Mild Ruffle' | 'Hyperbolic Ruffle'}
+ */
+export function getSurfaceType(multiplier = 1.0) {
+  if (multiplier <= 1.05) return 'Flat'
+  if (multiplier < 1.3) return 'Mild Ruffle'
+  return 'Hyperbolic Ruffle'
+}
+
+/**
+ * Short live caption for slider / demo narration
+ */
+export function getGrowthExplanation(multiplier = 1.0) {
+  const m = multiplier.toFixed(2)
+  if (multiplier <= 1.05) {
+    return `At ${m}, stitch growth is linear, so the surface stays flat.`
+  }
+  if (multiplier < 1.3) {
+    return `At ${m}, stitches grow a little faster than a flat circle needs, so mild ruffles appear.`
+  }
+  return `At ${m}, stitches grow too quickly for the circle, causing the fabric to ruffle.`
+}
+
+/**
+ * Row-by-row stitch pattern for the current growth formula
+ * @returns {Array<{row: number, stitches: number}>}
+ */
+export function generateStitchPattern(maxRows = 16, multiplier = 1.0, baseStitches = 6) {
+  const rows = []
+  for (let row = 1; row <= maxRows; row++) {
+    rows.push({
+      row,
+      stitches: Math.round(getAdjustedStitches(row, multiplier, baseStitches)),
+    })
+  }
+  return rows
+}
+
 /** Yarn blue → accent green by excess, nudged by row depth */
 function colorForExcess(excess, row, maxRows) {
   const t = Math.min(1, excess * 1.35)

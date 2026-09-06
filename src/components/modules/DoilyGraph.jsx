@@ -15,11 +15,16 @@ import { Line } from 'react-chartjs-2'
 import { RotateCcw, Info } from 'lucide-react'
 import StitchDivider from '../shared/StitchDivider'
 import YarnSpinner from '../shared/YarnSpinner'
-import { generateDoilyData, calculateRuffleThreshold } from '../../utils/doilyMath'
+import {
+  generateDoilyData,
+  calculateRuffleThreshold,
+  generateStitchPattern,
+  getSurfaceType,
+  getGrowthExplanation,
+} from '../../utils/doilyMath'
 
 const Doily3D = lazy(() => import('./Doily3D'))
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -39,171 +44,195 @@ export default function DoilyGraph() {
 
   const maxRows = 16
   const baseStitches = 6
+  const patternPreviewRows = 8
 
-  // Force chart resize on window resize
   useEffect(() => {
     const handleResize = () => {
-      // Chart.js will auto-resize, but we can trigger it explicitly if needed
       window.dispatchEvent(new Event('resize'))
     }
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Generate chart data based on debounced multiplier (reduces re-renders during slider drag)
+  const surfaceType = useMemo(
+    () => getSurfaceType(debouncedMultiplier),
+    [debouncedMultiplier]
+  )
+
+  const whatChanged = useMemo(
+    () => getGrowthExplanation(multiplier),
+    [multiplier]
+  )
+
+  const stitchPattern = useMemo(
+    () => generateStitchPattern(maxRows, debouncedMultiplier, baseStitches),
+    [debouncedMultiplier]
+  )
+
+  const showHyperbolicLine = Math.abs(debouncedMultiplier - 1.0) > 0.02
+
   const chartData = useMemo(() => {
     const data = generateDoilyData(maxRows, debouncedMultiplier, baseStitches)
-    
+    const datasets = [
+      {
+        label: 'Ideal Flat Plane (Linear)',
+        data: data.map((d) => d.linear),
+        borderColor: '#4A90E2',
+        backgroundColor: 'rgba(74, 144, 226, 0.1)',
+        borderWidth: 2,
+        fill: false,
+        tension: 0.1,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+      },
+      {
+        label: 'Current Growth',
+        data: data.map((d) => d.adjusted),
+        borderColor: '#1A1A1A',
+        backgroundColor: 'rgba(26, 26, 26, 0.1)',
+        borderWidth: 2,
+        fill: false,
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      },
+    ]
+
+    if (showHyperbolicLine) {
+      datasets.splice(1, 0, {
+        label: 'Hyperbolic Ruffle (Exponential)',
+        data: data.map((d) => d.exponential),
+        borderColor: '#2ECC71',
+        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+        borderWidth: 2,
+        fill: false,
+        tension: 0.1,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        borderDash: [5, 5],
+      })
+    }
+
     return {
       labels: data.map((d) => d.row),
-      datasets: [
-        {
-          label: 'Ideal Flat Plane (Linear)',
-          data: data.map((d) => d.linear),
-          borderColor: '#4A90E2', // Yarn Blue
-          backgroundColor: 'rgba(74, 144, 226, 0.1)',
-          borderWidth: 2,
-          fill: false,
-          tension: 0.1,
-          pointRadius: 3,
-          pointHoverRadius: 5,
-        },
-        {
-          label: 'Hyperbolic Ruffle (Exponential)',
-          data: data.map((d) => d.exponential),
-          borderColor: '#2ECC71', // Accent Green
-          backgroundColor: 'rgba(46, 204, 113, 0.1)',
-          borderWidth: 2,
-          fill: false,
-          tension: 0.1,
-          pointRadius: 3,
-          pointHoverRadius: 5,
-          borderDash: [5, 5],
-        },
-        {
-          label: 'Adjusted Growth',
-          data: data.map((d) => d.adjusted),
-          borderColor: '#1A1A1A', // Charcoal
-          backgroundColor: 'rgba(26, 26, 26, 0.1)',
-          borderWidth: 2,
-          fill: false,
-          tension: 0.4,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-        },
-      ],
+      datasets,
     }
-  }, [debouncedMultiplier])
+  }, [debouncedMultiplier, showHyperbolicLine])
 
-  // Calculate ruffle threshold
   const ruffleThreshold = useMemo(() => {
+    if (!showHyperbolicLine) return null
     return calculateRuffleThreshold(0.1, debouncedMultiplier, baseStitches)
-  }, [debouncedMultiplier])
+  }, [debouncedMultiplier, showHyperbolicLine])
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    resizeDelay: 0,
-    plugins: {
-      legend: {
-        position: 'top',
-        labels: {
-          font: {
-            family: "'Space Mono', 'Courier Prime', monospace",
-            size: 12,
-          },
-          color: '#1A1A1A',
-          padding: 15,
-          usePointStyle: true,
-        },
-      },
-      title: {
-        display: true,
-        text: 'Stitch Growth Patterns: Linear vs Exponential',
-        font: {
-          family: "'Space Mono', 'Courier Prime', monospace",
-          size: 16,
-          weight: 'bold',
-        },
-        color: '#1A1A1A',
-        padding: {
-          top: 10,
-          bottom: 20,
-        },
-      },
-      tooltip: {
-        backgroundColor: 'rgba(26, 26, 26, 0.9)',
-        titleColor: '#FAFAFA',
-        bodyColor: '#FAFAFA',
-        borderColor: '#4A90E2',
-        borderWidth: 1,
-        padding: 12,
-        titleFont: {
-          family: "'Space Mono', 'Courier Prime', monospace",
-          size: 13,
-          weight: 'bold',
-        },
-        bodyFont: {
-          family: "'Space Mono', 'Courier Prime', monospace",
-          size: 12,
-        },
-        callbacks: {
-          label: function (context) {
-            const label = context.dataset.label || ''
-            const value = context.parsed.y.toFixed(2)
-            return `${label}: ${value} stitches`
+  const chartOptions = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      resizeDelay: 0,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            font: {
+              family: "'Space Mono', 'Courier Prime', monospace",
+              size: 12,
+            },
+            color: '#1A1A1A',
+            padding: 15,
+            usePointStyle: true,
           },
         },
-      },
-    },
-    scales: {
-      x: {
         title: {
           display: true,
-          text: 'Row Number',
+          text: showHyperbolicLine
+            ? 'Stitch Growth: Linear vs Exponential'
+            : 'Stitch Growth: Flat (Linear)',
           font: {
             family: "'Space Mono', 'Courier Prime', monospace",
-            size: 12,
+            size: 16,
             weight: 'bold',
           },
           color: '#1A1A1A',
-        },
-        ticks: {
-          font: {
-            family: "'Space Mono', 'Courier Prime', monospace",
-            size: 11,
+          padding: {
+            top: 10,
+            bottom: 20,
           },
-          color: '#1A1A1A',
         },
-        grid: {
-          color: 'rgba(26, 26, 26, 0.1)',
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: 'Stitch Count',
-          font: {
+        tooltip: {
+          backgroundColor: 'rgba(26, 26, 26, 0.9)',
+          titleColor: '#FAFAFA',
+          bodyColor: '#FAFAFA',
+          borderColor: '#4A90E2',
+          borderWidth: 1,
+          padding: 12,
+          titleFont: {
             family: "'Space Mono', 'Courier Prime', monospace",
-            size: 12,
+            size: 13,
             weight: 'bold',
           },
-          color: '#1A1A1A',
-        },
-        ticks: {
-          font: {
+          bodyFont: {
             family: "'Space Mono', 'Courier Prime', monospace",
-            size: 11,
+            size: 12,
           },
-          color: '#1A1A1A',
+          callbacks: {
+            label(context) {
+              const label = context.dataset.label || ''
+              const value = context.parsed.y.toFixed(2)
+              return `${label}: ${value} stitches`
+            },
+          },
         },
-        grid: {
-          color: 'rgba(26, 26, 26, 0.1)',
-        },
-        beginAtZero: true,
       },
-    },
-  }
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Row Number',
+            font: {
+              family: "'Space Mono', 'Courier Prime', monospace",
+              size: 12,
+              weight: 'bold',
+            },
+            color: '#1A1A1A',
+          },
+          ticks: {
+            font: {
+              family: "'Space Mono', 'Courier Prime', monospace",
+              size: 11,
+            },
+            color: '#1A1A1A',
+          },
+          grid: {
+            color: 'rgba(26, 26, 26, 0.1)',
+          },
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Stitch Count',
+            font: {
+              family: "'Space Mono', 'Courier Prime', monospace",
+              size: 12,
+              weight: 'bold',
+            },
+            color: '#1A1A1A',
+          },
+          ticks: {
+            font: {
+              family: "'Space Mono', 'Courier Prime', monospace",
+              size: 11,
+            },
+            color: '#1A1A1A',
+          },
+          grid: {
+            color: 'rgba(26, 26, 26, 0.1)',
+          },
+          beginAtZero: true,
+        },
+      },
+    }),
+    [showHyperbolicLine]
+  )
 
   const handleReset = () => {
     setMultiplier(1.0)
@@ -211,7 +240,6 @@ export default function DoilyGraph() {
 
   return (
     <div className="p-3 lg:p-4 max-w-7xl mx-auto w-full">
-      {/* Header */}
       <div className="mb-6">
         <h2 className="font-display text-3xl font-normal text-charcoal mb-2">
           Radial Topology
@@ -221,9 +249,7 @@ export default function DoilyGraph() {
         </p>
       </div>
 
-      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
-        {/* 3D + reference images */}
         <div className="space-y-3">
           <div>
             <h3 className="text-xs font-semibold text-charcoal/70 uppercase tracking-wide mb-2">
@@ -250,8 +276,7 @@ export default function DoilyGraph() {
               />
             </Suspense>
           </div>
-          
-          {/* Additional Images Grid */}
+
           <div className="grid grid-cols-2 gap-2">
             <div className="relative bg-white/80 border border-charcoal/10 rounded-xl overflow-hidden shadow-sm">
               <img
@@ -278,12 +303,12 @@ export default function DoilyGraph() {
               />
             </div>
           </div>
-          
+
           <div className="text-sm text-charcoal/70 space-y-2">
             <p>
-              <strong>Mathematical Insight:</strong> When stitch count grows linearly (multiplier = 1.0),
-              the lace stays flat. Raise the multiplier and excess stitches buckle into hyperbolic
-              ruffles—rings shift blue→green as “too much yarn for the circle” grows.
+              <strong>Mathematical Insight:</strong> When stitch count grows linearly (multiplier
+              = 1.0), the lace stays flat. Raise the multiplier and excess stitches buckle into
+              hyperbolic ruffles—rings shift blue→green as “too much yarn for the circle” grows.
             </p>
             {ruffleThreshold && (
               <p className="text-accent-green font-semibold">
@@ -293,15 +318,14 @@ export default function DoilyGraph() {
           </div>
         </div>
 
-        {/* Chart Section */}
         <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
-          <div 
+          <div
             ref={chartContainerRef}
-            className="w-full" 
-            style={{ 
-              minHeight: '300px', 
+            className="w-full"
+            style={{
+              minHeight: '300px',
               height: 'clamp(300px, 40vh, 500px)',
-              position: 'relative'
+              position: 'relative',
             }}
           >
             <Line data={chartData} options={chartOptions} />
@@ -309,10 +333,9 @@ export default function DoilyGraph() {
         </div>
       </div>
 
-      {/* Controls Section */}
-      <div className="bg-white/80 border border-charcoal/10 rounded-xl p-6 shadow-sm">
+      {/* Controls + live explanation */}
+      <div className="bg-white/80 border border-charcoal/10 rounded-xl p-6 shadow-sm mb-3">
         <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-          {/* Slider */}
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
               <label
@@ -345,7 +368,11 @@ export default function DoilyGraph() {
               <span>1.00 (Linear)</span>
               <span>1.50 (Ruffled)</span>
             </div>
-            <div className="flex flex-wrap gap-2 mt-3" role="group" aria-label="Growth formula presets">
+            <div
+              className="flex flex-wrap gap-2 mt-3"
+              role="group"
+              aria-label="Growth formula presets"
+            >
               {[
                 { label: 'Flat', value: 1.0 },
                 { label: 'Mild ruffle', value: 1.2 },
@@ -371,7 +398,6 @@ export default function DoilyGraph() {
             </div>
           </div>
 
-          {/* Reset Button */}
           <button
             onClick={handleReset}
             className="flex items-center gap-2 px-4 py-2 bg-charcoal text-canvas-white rounded-lg hover:bg-charcoal/90 transition-colors text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
@@ -381,7 +407,6 @@ export default function DoilyGraph() {
             Reset
           </button>
 
-          {/* Info Toggle */}
           <button
             onClick={() => setShowInfo(!showInfo)}
             className="flex items-center gap-2 px-4 py-2 border border-charcoal/20 text-charcoal rounded-lg hover:bg-charcoal/5 transition-colors text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
@@ -393,7 +418,14 @@ export default function DoilyGraph() {
           </button>
         </div>
 
-        {/* Mathematical Formulas (Collapsible) */}
+        <p
+          className="mt-4 text-sm text-charcoal/80 leading-relaxed border-l-2 border-yarn-blue/40 pl-3"
+          aria-live="polite"
+        >
+          <span className="font-semibold text-charcoal">What changed? </span>
+          {whatChanged}
+        </p>
+
         {showInfo && (
           <div className="mt-6 pt-6 space-y-3 text-sm">
             <StitchDivider color="rgba(26,26,26,0.2)" className="mb-6" />
@@ -409,7 +441,7 @@ export default function DoilyGraph() {
                 </code>
               </div>
               <div>
-                <strong className="text-charcoal">Adjusted Growth:</strong>{' '}
+                <strong className="text-charcoal">Current Growth:</strong>{' '}
                 <code className="text-charcoal">
                   blends linear and exponential based on multiplier
                 </code>
@@ -437,6 +469,72 @@ export default function DoilyGraph() {
           </div>
         )}
       </div>
+
+      {/* Generated stitch pattern — math → crochet instructions */}
+      <div className="bg-white/90 border border-charcoal/10 rounded-xl p-5 lg:p-6 shadow-sm mb-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+          <h3 className="font-display text-xl text-charcoal">Generated Stitch Pattern</h3>
+          <p className="text-xs font-mono text-charcoal/55">
+            multiplier {debouncedMultiplier.toFixed(2)} · base {baseStitches}
+          </p>
+        </div>
+        <p className="text-sm text-charcoal/60 mb-4 max-w-2xl">
+          Row-by-row stitch counts from the current growth formula—math translated into something
+          you could crochet.
+        </p>
+        <div className="grid gap-4 md:grid-cols-[1fr_auto]">
+          <ol className="font-mono text-sm text-charcoal/85 space-y-1.5 bg-charcoal/[0.03] rounded-lg border border-charcoal/8 p-4 max-h-56 overflow-y-auto">
+            {stitchPattern.slice(0, patternPreviewRows).map(({ row, stitches }) => (
+              <li key={row}>
+                Row {row}: {stitches} stitch{stitches === 1 ? '' : 'es'}
+              </li>
+            ))}
+            {stitchPattern.length > patternPreviewRows && (
+              <li className="text-charcoal/45 text-xs pt-1">
+                … {stitchPattern.length - patternPreviewRows} more rows (see chart for full curve)
+              </li>
+            )}
+          </ol>
+          <div className="flex md:flex-col gap-3 md:min-w-[11rem]">
+            <div className="flex-1 rounded-lg border border-charcoal/10 bg-white px-4 py-3">
+              <div className="text-[10px] uppercase tracking-wide text-charcoal/45 mb-1">
+                Surface
+              </div>
+              <div className="font-semibold text-charcoal text-sm">{surfaceType}</div>
+            </div>
+            <div className="flex-1 rounded-lg border border-charcoal/10 bg-white px-4 py-3">
+              <div className="text-[10px] uppercase tracking-wide text-charcoal/45 mb-1">
+                Outer row
+              </div>
+              <div className="font-mono text-sm text-charcoal">
+                {stitchPattern[stitchPattern.length - 1]?.stitches ?? 0} sts
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Personal inspiration — below the interactive core */}
+      <section className="rounded-xl border border-charcoal/10 bg-charcoal/[0.03] overflow-hidden">
+        <div className="grid md:grid-cols-[minmax(0,200px)_1fr]">
+          <div className="relative min-h-[140px] md:min-h-full bg-charcoal/5">
+            <img
+              src="/images/doily-white-complex.jpg"
+              alt="Hand-crocheted lace inspired by gifts from a friend"
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+          <div className="p-5 lg:p-6">
+            <h3 className="font-display text-xl text-charcoal mb-2">Inspiration</h3>
+            <p className="text-sm text-charcoal/65 leading-relaxed max-w-2xl">
+              Inspired by crocheted dolls, scarves, and hats gifted by a friend, CrochetLab asks
+              how simple loops can generate complex mathematical forms—and whether code can help
+              makers explore those forms before picking up a hook.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
