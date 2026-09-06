@@ -1,6 +1,6 @@
-# Demo script (Congressional App Challenge · ~2 minutes)
+# Demo script (~2 minutes)
 
-Use the live site with **Demo Mode on** (default blue banner).
+Use the live site with **Demo Mode on** (default).
 
 ## Suggested narration
 
@@ -24,6 +24,6 @@ Use the live site with **Demo Mode on** (default blue banner).
 
 ## Tips
 
-- Keep Demo Mode on for judging unless you specifically want live MobileNet.
+- Keep Demo Mode on for demos unless you specifically want live MobileNet.
 - Have a PDF download and a sample image ready.
 - If Wi‑Fi is weak, stay on Demo Mode and skip waiting for model download.

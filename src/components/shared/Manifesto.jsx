@@ -253,8 +253,6 @@ export default function Manifesto() {
           </p>
           <p className="text-sm text-charcoal/70 mb-4">
             Created by <span className="font-semibold text-charcoal">Jason Zlatinski</span>
-            {' · '}
-            Congressional App Challenge
           </p>
           <div className="flex justify-center gap-6">
             <a

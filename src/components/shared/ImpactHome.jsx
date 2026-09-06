@@ -42,7 +42,7 @@ const MODULES = [
 ]
 
 /**
- * CAC-facing landing: impact story + clear paths into each module
+ * Landing: impact story + clear paths into each module
  */
 export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
   return (
@@ -64,7 +64,7 @@ export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
           transition={{ duration: 0.5 }}
         >
           <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-yarn-blue mb-3">
-            Congressional App Challenge · STEM × Craft
+            STEM × Craft · Interactive Lab
           </p>
           <p className="text-sm text-charcoal/55 mb-3">
             Created by <span className="font-semibold text-charcoal">Jason Zlatinski</span>
@@ -75,7 +75,7 @@ export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
           </h2>
           <p className="text-charcoal/65 text-base lg:text-lg max-w-2xl leading-relaxed">
             The Algorithmic Loop is an interactive lab that makes advanced computer science
-            visible through fiber craft—so students, makers, and judges can see algorithms,
+            visible through fiber craft—so students, makers, and audiences can see algorithms,
             geometry, and explainable AI without a textbook gatekeeper.
           </p>
 
@@ -161,8 +161,6 @@ export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
             <span className="font-semibold text-charcoal">Jason Zlatinski</span>
             {' · '}
             The Algorithmic Loop
-            {' · '}
-            Congressional App Challenge
           </p>
           <p className="mt-1 text-xs text-charcoal/40">
             <a
