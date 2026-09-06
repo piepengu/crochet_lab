@@ -2,23 +2,23 @@ import { useState, useEffect, useCallback } from 'react'
 
 /**
  * Custom hook for image classification using TensorFlow.js and MobileNet
- * 
- * Loads the MobileNet model on mount and provides a function to classify images.
- * Handles loading states, errors, and cleanup.
- * 
- * @returns {Object} Object containing:
- *   - model: The loaded MobileNet model (null if not loaded)
- *   - loading: Boolean indicating if model is loading
- *   - error: Error message if model loading failed
- *   - classifyImage: Function to classify an image element
+ *
+ * @param {{ enabled?: boolean }} [options] - Pass enabled:false to skip model load (Demo/mock mode)
+ * @returns {Object} model, loading, error, classifyImage, getActivationHeatmap
  */
-export function useImageClassifier() {
+export function useImageClassifier({ enabled = true } = {}) {
   const [model, setModel] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(enabled)
   const [error, setError] = useState(null)
 
-  // Load MobileNet model on mount
+  // Load MobileNet only when enabled
   useEffect(() => {
+    if (!enabled) {
+      setLoading(false)
+      setError(null)
+      return
+    }
+
     let isMounted = true
 
     const loadModel = async () => {
@@ -26,38 +26,26 @@ export function useImageClassifier() {
         setLoading(true)
         setError(null)
 
-        // Dynamically import TensorFlow.js core first
         const tf = await import('@tensorflow/tfjs')
-        
-        // Import WebGL backend (most performant) - importing registers it automatically
-        // The backend must be imported before calling tf.ready() or setBackend()
+
         try {
           await import('@tensorflow/tfjs-backend-webgl')
-          console.log('WebGL backend imported')
         } catch (webglError) {
           console.warn('WebGL backend import failed, will use CPU:', webglError)
         }
-        
-        // Set backend (try WebGL first, fallback to CPU)
+
         try {
           await tf.setBackend('webgl')
-          console.log('WebGL backend set')
         } catch (webglSetError) {
           console.warn('WebGL backend not available, using CPU:', webglSetError)
           await tf.setBackend('cpu')
-          console.log('CPU backend set')
         }
-        
-        // Initialize TensorFlow.js - this initializes the selected backend
-        await tf.ready()
-        console.log('TensorFlow.js initialized with backend:', tf.getBackend())
 
-        // Dynamically import MobileNet model
+        await tf.ready()
+
         const mobilenetModule = await import('@tensorflow-models/mobilenet')
         const mobilenet = mobilenetModule.default || mobilenetModule
 
-        // Load MobileNet v2 model (lighter and faster than v1)
-        // version: 2 = MobileNetV2, alpha: 1.0 = full width
         const loadedModel = await mobilenet.load({
           version: 2,
           alpha: 1.0,
@@ -78,12 +66,10 @@ export function useImageClassifier() {
 
     loadModel()
 
-    // Cleanup function
     return () => {
       isMounted = false
-      // Note: TensorFlow.js models are automatically cleaned up when component unmounts
     }
-  }, []) // Empty dependency array - only run on mount
+  }, [enabled])
 
   /**
    * Classify an image element

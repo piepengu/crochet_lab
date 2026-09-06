@@ -170,11 +170,10 @@ export default function Manifesto() {
           >
             <p>This is just the beginning. Future directions could include:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Pattern generation from mathematical functions</li>
-              <li>3D visualization of hyperbolic crochet surfaces</li>
-              <li>Custom stitch pattern recognition trained on user uploads</li>
+              <li>Classroom lesson packs aligned to geometry &amp; CS standards</li>
+              <li>Custom stitch classifiers trained on community uploads</li>
               <li>Procedural blanket designs using cellular automata</li>
-              <li>Integration with knitting machine firmware</li>
+              <li>Deeper guided tours for each algorithm module</li>
             </ul>
           </div>
         </motion.section>

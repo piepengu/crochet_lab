@@ -14,19 +14,19 @@ const mockPredictions = [
   { className: 'Knit Stitch', probability: 0.03 },
 ]
 
-export default function TextureScanner() {
+export default function TextureScanner({ demoMode = false }) {
+  const [useMockMode, setUseMockMode] = useState(demoMode)
   const {
     model,
     loading: modelLoading,
     error: modelError,
     classifyImage,
     getActivationHeatmap,
-  } = useImageClassifier()
+  } = useImageClassifier({ enabled: !useMockMode })
   const [imageUrl, setImageUrl] = useState(null)
   const [predictions, setPredictions] = useState(null)
   const [classifying, setClassifying] = useState(false)
   const [classificationError, setClassificationError] = useState(null)
-  const [useMockMode, setUseMockMode] = useState(false)
   const [showHeatmap, setShowHeatmap] = useState(true)
   const [heatmapUrl, setHeatmapUrl] = useState(null)
   const [heatmapError, setHeatmapError] = useState(null)
@@ -34,6 +34,11 @@ export default function TextureScanner() {
   const fileInputRef = useRef(null)
   const imageRef = useRef(null)
   const fileInputId = useId()
+
+  // Stay in sync when App Demo Mode is toggled
+  useEffect(() => {
+    setUseMockMode(demoMode)
+  }, [demoMode])
 
   const buildHeatmap = useCallback(
     async (img) => {
@@ -218,7 +223,7 @@ export default function TextureScanner() {
       </div>
 
       {/* Model Status */}
-      {modelLoading && (
+      {modelLoading && !useMockMode && (
         <div className="mb-4 p-4 bg-yarn-blue/10 border border-yarn-blue/20 rounded-lg">
           <div className="flex items-center gap-2 text-yarn-blue">
             <YarnSpinner size={22} />
@@ -260,7 +265,11 @@ export default function TextureScanner() {
             }}
             className="rounded"
           />
-          <span>Use mock mode (for faster demos)</span>
+          <span>
+            {demoMode
+              ? 'Mock mode (Demo Mode — recommended for presentations)'
+              : 'Use mock mode (for faster demos)'}
+          </span>
         </label>
       </div>
 

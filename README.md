@@ -2,7 +2,25 @@
 
 **Where craft meets computation** — an interactive lab exploring the mathematics, algorithms, and computer vision behind fiber craft.
 
+Built for the **Congressional App Challenge**: STEM education through craft, maker tools, and explainable AI—run entirely in the browser.
+
 [Live demo](https://crochet-lab.vercel.app/) · [Source](https://github.com/piepengu/crochet_lab)
+
+---
+
+## Congressional App Challenge
+
+| Pillar | How this app addresses it |
+|--------|---------------------------|
+| **Idea** | Unusual bridge of hyperbolic geometry, graph coloring, and on-device AI with fiber craft |
+| **Implementation** | Interactive 3D, printable PDFs, Stash Buster, attention heatmaps, Demo Mode for reliable judging |
+| **Coding** | Client-side React, procedural mesh math, constraint satisfaction, TensorFlow.js |
+
+**Demo tip:** Open the site with **Demo Mode** on (default). Walk Impact → Radial Topology → Modular Permutations → Texture Recognition.
+
+### AI disclosure (for submission)
+
+AI coding assistants (including Cursor) were used to accelerate implementation of UI wiring, documentation, and some utility code. Core concepts, architecture, algorithm choices (hyperbolic growth, graph coloring / stash constraints, explainable activations), and validation of behavior were directed and reviewed by the student author. The Texture Scanner uses the public MobileNet model via TensorFlow.js; Demo Mode provides deterministic mock predictions for presentations.
 
 ---
 
@@ -91,5 +109,6 @@ src/
 - [x] Explainable AI heatmaps
 - [x] Micro-interactions (hook cursor, yarn spinners)
 - [x] Stash Buster — yarn quantity constraints in pattern generation
+- [x] Impact landing + Demo Mode for Congressional App Challenge
+- [x] Vite manual chunks (TF.js / Three / PDF)
 - [ ] Power-user hotkeys (`Space`, `R`, `1`–`3`)
-- [ ] Vite bundle splitting for faster first load

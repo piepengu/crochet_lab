@@ -1,9 +1,15 @@
 import { useState } from 'react'
-import { Circle, Grid3x3, Scan, FileText, Menu, X } from 'lucide-react'
+import { Home, Circle, Grid3x3, Scan, FileText, Menu, X } from 'lucide-react'
 import clsx from 'clsx'
 import BrandMark from '../shared/BrandMark'
 
 const navigationItems = [
+  {
+    id: 'home',
+    label: 'Impact',
+    icon: Home,
+    description: 'Why this lab matters',
+  },
   {
     id: 'doily',
     label: 'Radial Topology',
@@ -97,7 +103,7 @@ export default function Sidebar({ activeModule, onModuleChange }) {
               const isActive = activeModule === item.id
 
               return (
-                <li key={item.id} className="lg:flex-1 lg:max-w-[168px]">
+                <li key={item.id} className="lg:flex-1 lg:max-w-[150px]">
                   <button
                     onClick={() => handleNavClick(item.id)}
                     aria-current={isActive ? 'page' : undefined}
