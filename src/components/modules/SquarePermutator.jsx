@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
+import { motion } from 'framer-motion'
 import clsx from 'clsx'
 import { RefreshCw, Grid3x3, Square, Grid, Download } from 'lucide-react'
 import StitchDivider from '../shared/StitchDivider'
@@ -44,6 +45,7 @@ export default function SquarePermutator() {
   const [stashLimits, setStashLimits] = useState(() =>
     defaultStashLimits(DEFAULT_COLORS, 9)
   )
+  const [patternKey, setPatternKey] = useState(0)
 
   const cellCount = gridSize * gridSize
 
@@ -67,6 +69,7 @@ export default function SquarePermutator() {
       setGrid(result.grid)
       setAttempts(result.attempts)
       setLastSuccess(result.success)
+      setPatternKey((k) => k + 1)
       setIsGenerating(false)
     }, 100)
   }, [gridSize, colors, quantityConstraints])
@@ -105,6 +108,7 @@ export default function SquarePermutator() {
     setGrid(initializeGrid(newSize, newSize))
     setAttempts(0)
     setLastSuccess(true)
+    setPatternKey((k) => k + 1)
     const cells = newSize * newSize
     setStashLimits((prev) =>
       colors.map((_, i) => Math.min(prev[i] ?? cells, cells) || defaultStashLimits(colors, cells)[i])
@@ -199,7 +203,7 @@ export default function SquarePermutator() {
               </div>
             </div>
 
-            <div
+            <motion.div
               className="mx-auto cursor-hook"
               style={{
                 display: 'grid',
@@ -208,22 +212,42 @@ export default function SquarePermutator() {
                 maxWidth: '400px',
                 width: '100%',
               }}
+              animate={
+                isGenerating
+                  ? { opacity: 0.55, scale: 0.985 }
+                  : { opacity: 1, scale: 1 }
+              }
+              transition={{ duration: 0.25 }}
             >
               {grid.map((row, rowIndex) =>
                 row.map((color, colIndex) => {
                   const isInvalid = invalidSquares.some(
                     (sq) => sq.row === rowIndex && sq.col === colIndex
                   )
+                  const staggerIndex = rowIndex * gridSize + colIndex
 
                   return (
-                    <button
-                      key={`${rowIndex}-${colIndex}`}
+                    <motion.button
+                      key={`${patternKey}-${rowIndex}-${colIndex}`}
+                      type="button"
                       onClick={() => handleSquareClick(rowIndex, colIndex)}
+                      initial={
+                        color
+                          ? { opacity: 0, scale: 0.72, y: 6 }
+                          : { opacity: 0.5, scale: 0.96 }
+                      }
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      transition={{
+                        duration: 0.38,
+                        delay: color ? staggerIndex * 0.035 : 0,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      whileHover={color ? { scale: 1.05 } : undefined}
+                      whileTap={{ scale: 0.97 }}
                       className={`
-                        cursor-hook rounded-lg transition-all duration-200
+                        cursor-hook rounded-lg
                         ${color ? '' : 'bg-charcoal/5 border-2 border-dashed border-charcoal/20'}
                         ${isInvalid ? 'ring-2 ring-red-500 ring-offset-2' : ''}
-                        hover:scale-105 hover:shadow-lg
                         focus:outline-none focus:ring-2 focus:ring-yarn-blue focus:ring-offset-2
                       `}
                       style={{
@@ -233,13 +257,16 @@ export default function SquarePermutator() {
                         aspectRatio: '1 / 1',
                         width: '100%',
                         minHeight: '60px',
+                        boxShadow: color
+                          ? `0 4px 14px color-mix(in srgb, ${color} 28%, transparent)`
+                          : undefined,
                       }}
                       aria-label={`Square at row ${rowIndex + 1}, column ${colIndex + 1}, color ${color || 'empty'}`}
                     />
                   )
                 })
               )}
-            </div>
+            </motion.div>
 
             <div className="mt-4 flex items-center justify-between text-sm">
               <div className="flex flex-wrap items-center gap-4">
