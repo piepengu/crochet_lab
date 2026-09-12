@@ -252,13 +252,11 @@ export default function DoilyGraph() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
         <div className="space-y-3">
           <div>
-            <h3 className="text-xs font-semibold text-charcoal/70 uppercase tracking-wide mb-2">
-              3D Hyperbolic Surface
-            </h3>
+            <p className="type-label mb-2">3D hyperbolic surface</p>
             <Suspense
               fallback={
                 <div
-                  className="flex items-center justify-center rounded-xl border border-charcoal/10 bg-charcoal/5"
+                  className="flex items-center justify-center border border-charcoal/10 bg-charcoal/[0.03]"
                   style={{ minHeight: '280px' }}
                 >
                   <div className="flex items-center gap-2 text-yarn-blue text-sm">
@@ -277,8 +275,8 @@ export default function DoilyGraph() {
             </Suspense>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <div className="relative bg-white/80 border border-charcoal/10 rounded-xl overflow-hidden shadow-sm">
+          <div className="grid grid-cols-2 gap-3">
+            <figure className="overflow-hidden">
               <img
                 src="/images/doily-radial-beige.jpg"
                 alt="Radial beige doily pattern"
@@ -289,8 +287,8 @@ export default function DoilyGraph() {
                   e.target.src = '/images/doily-white-complex.jpg'
                 }}
               />
-            </div>
-            <div className="relative bg-white/80 border border-charcoal/10 rounded-xl overflow-hidden shadow-sm">
+            </figure>
+            <figure className="overflow-hidden">
               <img
                 src="/images/doily-square-mesh.jpg"
                 alt="Square mesh doily pattern"
@@ -301,27 +299,29 @@ export default function DoilyGraph() {
                   e.target.src = '/images/doily-white-complex.jpg'
                 }}
               />
-            </div>
+            </figure>
           </div>
 
-          <div className="text-sm text-charcoal/70 space-y-2">
+          <div className="border-l border-yarn-blue/40 pl-4 text-sm text-charcoal/70 space-y-2">
             <p>
-              <strong>Mathematical Insight:</strong> When stitch count grows linearly (multiplier
-              = 1.0), the lace stays flat. Raise the multiplier and excess stitches buckle into
-              hyperbolic ruffles—rings shift blue→green as “too much yarn for the circle” grows.
+              <span className="font-display text-base text-charcoal">Mathematical insight. </span>
+              When stitch count grows linearly (multiplier = 1.0), the lace stays flat. Raise the
+              multiplier and excess stitches buckle into hyperbolic ruffles—rings shift blue→green
+              as “too much yarn for the circle” grows.
             </p>
             {ruffleThreshold && (
-              <p className="text-accent-green font-semibold">
+              <p className="type-meta text-accent-green">
                 Ruffle becomes noticeable around row {ruffleThreshold} with current multiplier.
               </p>
             )}
           </div>
         </div>
 
-        <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
+        <div>
+          <p className="type-label mb-2">Stitch growth chart</p>
           <div
             ref={chartContainerRef}
-            className="w-full"
+            className="w-full border-t border-charcoal/10 pt-3"
             style={{
               minHeight: '300px',
               height: 'clamp(300px, 40vh, 500px)',
@@ -333,8 +333,8 @@ export default function DoilyGraph() {
         </div>
       </div>
 
-      {/* Controls + live explanation */}
-      <div className="bg-white/80 border border-charcoal/10 rounded-xl p-6 shadow-sm mb-3">
+      {/* Controls — tool surface */}
+      <div className="border border-charcoal/12 rounded-md p-5 lg:p-6 mb-8 bg-canvas-warm/60">
         <div className="flex flex-col lg:flex-row lg:items-center gap-6">
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
@@ -344,7 +344,7 @@ export default function DoilyGraph() {
               >
                 Growth Multiplier
               </label>
-              <span className="text-lg font-bold text-yarn-blue font-mono">
+              <span className="text-lg font-bold text-yarn-blue font-mono tabular-nums">
                 {multiplier.toFixed(2)}
               </span>
             </div>
@@ -363,10 +363,10 @@ export default function DoilyGraph() {
               aria-valuenow={multiplier}
               aria-valuetext={`${multiplier.toFixed(2)}`}
             />
-            <div className="flex justify-between text-xs text-charcoal/50 mt-1">
-              <span>0.80 (Flat)</span>
-              <span>1.00 (Linear)</span>
-              <span>1.50 (Ruffled)</span>
+            <div className="flex justify-between type-meta mt-1">
+              <span>0.80 Flat</span>
+              <span>1.00 Linear</span>
+              <span>1.50 Ruffled</span>
             </div>
             <div
               className="flex flex-wrap gap-2 mt-3"
@@ -384,10 +384,10 @@ export default function DoilyGraph() {
                     key={preset.label}
                     type="button"
                     onClick={() => setMultiplier(preset.value)}
-                    className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue ${
+                    className={`ui-transition px-3 py-1.5 text-xs font-mono rounded-md border focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue ${
                       active
                         ? 'bg-yarn-blue text-white border-yarn-blue'
-                        : 'bg-white text-charcoal/80 border-charcoal/15 hover:border-yarn-blue/40'
+                        : 'bg-transparent text-charcoal/80 border-charcoal/15 hover:border-yarn-blue/40'
                     }`}
                     aria-pressed={active}
                   >
@@ -400,7 +400,7 @@ export default function DoilyGraph() {
 
           <button
             onClick={handleReset}
-            className="flex items-center gap-2 px-4 py-2 bg-charcoal text-canvas-white rounded-lg hover:bg-charcoal/90 transition-colors text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+            className="ui-transition flex items-center gap-2 px-4 py-2 bg-charcoal text-canvas-white rounded-md hover:bg-charcoal/90 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
             aria-label="Reset multiplier to 1.0"
           >
             <RotateCcw size={16} />
@@ -409,7 +409,7 @@ export default function DoilyGraph() {
 
           <button
             onClick={() => setShowInfo(!showInfo)}
-            className="flex items-center gap-2 px-4 py-2 border border-charcoal/20 text-charcoal rounded-lg hover:bg-charcoal/5 transition-colors text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+            className="ui-transition flex items-center gap-2 px-4 py-2 border border-charcoal/20 text-charcoal rounded-md hover:border-yarn-blue/35 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
             aria-label={showInfo ? 'Hide formulas' : 'Show mathematical formulas'}
             aria-expanded={showInfo}
           >
@@ -419,7 +419,7 @@ export default function DoilyGraph() {
         </div>
 
         <p
-          className="mt-4 text-sm text-charcoal/80 leading-relaxed border-l-2 border-yarn-blue/40 pl-3"
+          className="mt-5 text-sm text-charcoal/75 leading-relaxed border-l border-yarn-blue/40 pl-3"
           aria-live="polite"
         >
           <span className="font-semibold text-charcoal">What changed? </span>
@@ -429,7 +429,7 @@ export default function DoilyGraph() {
         {showInfo && (
           <div className="mt-6 pt-6 space-y-3 text-sm">
             <StitchDivider color="rgba(26,26,26,0.2)" className="mb-6" />
-            <div className="bg-charcoal/5 p-4 rounded-lg font-mono text-xs space-y-2">
+            <div className="bg-charcoal/[0.04] p-4 rounded-md font-mono text-xs space-y-2">
               <div>
                 <strong className="text-yarn-blue">Linear Growth:</strong>{' '}
                 <code className="text-charcoal">stitches = baseStitches × row</code>
@@ -470,20 +470,20 @@ export default function DoilyGraph() {
         )}
       </div>
 
-      {/* Generated stitch pattern — math → crochet instructions */}
-      <div className="bg-white/90 border border-charcoal/10 rounded-xl p-5 lg:p-6 shadow-sm mb-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
-          <h3 className="font-display text-xl text-charcoal">Generated Stitch Pattern</h3>
-          <p className="text-xs font-mono text-charcoal/55">
+      {/* Generated stitch pattern */}
+      <section className="mb-10">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+          <h3 className="font-display text-2xl text-charcoal">Generated Stitch Pattern</h3>
+          <p className="type-meta">
             multiplier {debouncedMultiplier.toFixed(2)} · base {baseStitches}
           </p>
         </div>
-        <p className="text-sm text-charcoal/60 mb-4 max-w-2xl">
-          Row-by-row stitch counts from the current growth formula—math translated into something
-          you could crochet.
+        <p className="text-sm text-charcoal/65 mb-1 max-w-2xl">
+          From equation to hook — row-by-row stitch counts you could crochet.
         </p>
-        <div className="grid gap-4 md:grid-cols-[1fr_auto]">
-          <ol className="font-mono text-sm text-charcoal/85 space-y-1.5 bg-charcoal/[0.03] rounded-lg border border-charcoal/8 p-4 max-h-56 overflow-y-auto">
+        <StitchDivider color="rgba(26,26,26,0.12)" height={14} segmentCount={8} className="mb-5" />
+        <div className="grid gap-6 md:grid-cols-[1fr_auto]">
+          <ol className="font-mono text-sm text-charcoal/85 space-y-1.5 border-l border-charcoal/15 pl-4 max-h-56 overflow-y-auto">
             {stitchPattern.slice(0, patternPreviewRows).map(({ row, stitches }) => (
               <li key={row}>
                 Row {row}: {stitches} stitch{stitches === 1 ? '' : 'es'}
@@ -495,42 +495,44 @@ export default function DoilyGraph() {
               </li>
             )}
           </ol>
-          <div className="flex md:flex-col gap-3 md:min-w-[11rem]">
-            <div className="flex-1 rounded-lg border border-charcoal/10 bg-white px-4 py-3">
-              <div className="text-[10px] uppercase tracking-wide text-charcoal/45 mb-1">
-                Surface
-              </div>
-              <div className="font-semibold text-charcoal text-sm">{surfaceType}</div>
+          <div className="flex md:flex-col gap-4 md:min-w-[10rem] md:border-l md:border-charcoal/10 md:pl-5">
+            <div>
+              <div className="type-label mb-1">Surface</div>
+              <div className="font-display text-lg text-charcoal">{surfaceType}</div>
             </div>
-            <div className="flex-1 rounded-lg border border-charcoal/10 bg-white px-4 py-3">
-              <div className="text-[10px] uppercase tracking-wide text-charcoal/45 mb-1">
-                Outer row
-              </div>
-              <div className="font-mono text-sm text-charcoal">
+            <div>
+              <div className="type-label mb-1">Outer row</div>
+              <div className="font-mono text-sm text-charcoal tabular-nums">
                 {stitchPattern[stitchPattern.length - 1]?.stitches ?? 0} sts
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Personal inspiration — below the interactive core */}
-      <section className="rounded-xl border border-charcoal/10 bg-charcoal/[0.03] overflow-hidden">
-        <div className="grid md:grid-cols-[minmax(0,200px)_1fr]">
-          <div className="relative min-h-[140px] md:min-h-full bg-charcoal/5">
+      {/* Inspiration — open editorial composition */}
+      <section className="border-t border-charcoal/10 pt-8">
+        <div className="grid md:grid-cols-[minmax(0,220px)_1fr] gap-6 md:gap-10 items-start">
+          <figure className="overflow-hidden">
             <img
               src="/images/texture-mesh.jpg"
               alt="Crocheted mesh texture from gifts that inspired CrochetLab"
-              className="absolute inset-0 w-full h-full object-cover object-center"
+              className="w-full h-full max-h-52 object-cover object-center"
               loading="lazy"
             />
-          </div>
-          <div className="p-5 lg:p-6">
-            <h3 className="font-display text-xl text-charcoal mb-2">Inspiration</h3>
-            <p className="text-sm text-charcoal/65 leading-relaxed max-w-2xl">
+            <figcaption className="type-meta mt-2">
+              Crochet pieces courtesy of a friend.
+            </figcaption>
+          </figure>
+          <div>
+            <h3 className="font-display text-2xl text-charcoal mb-3">Inspiration</h3>
+            <p className="text-sm sm:text-base text-charcoal/65 leading-relaxed max-w-2xl">
               Inspired by crocheted dolls, scarves, hats, and bags gifted by a friend, CrochetLab
               asks how simple loops can generate complex mathematical forms—and whether code can
               help makers explore those forms before picking up a hook.
+            </p>
+            <p className="type-meta mt-4">
+              Interface, code, and mathematical models by Jason Zlatinski.
             </p>
           </div>
         </div>

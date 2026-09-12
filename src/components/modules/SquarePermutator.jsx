@@ -177,11 +177,16 @@ export default function SquarePermutator() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-6">
         <div className="lg:col-span-2">
-          <div className="bg-white/80 border border-charcoal/10 rounded-xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-charcoal">Pattern Grid</h3>
+          <div className="border border-charcoal/12 rounded-md p-5 lg:p-6 bg-canvas-warm/40">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
+              <div>
+                <h3 className="font-display text-2xl text-charcoal">Pattern Grid</h3>
+                <p className="text-sm text-charcoal/60 mt-1">
+                  Color a modular crochet layout under graph-coloring constraints.
+                </p>
+              </div>
               <div className="flex items-center gap-2">
                 {GRID_SIZES.map(({ size, label, icon: Icon }) => (
                   <button
@@ -190,18 +195,19 @@ export default function SquarePermutator() {
                     aria-pressed={gridSize === size}
                     aria-label={`Set grid size to ${label}`}
                     className={clsx(
-                      'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2',
+                      'ui-transition flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2',
                       gridSize === size
-                        ? 'bg-yarn-blue text-white shadow-md ring-2 ring-yarn-blue/30'
-                        : 'bg-charcoal/5 text-charcoal hover:bg-charcoal/10 hover:text-charcoal'
+                        ? 'bg-yarn-blue text-white'
+                        : 'bg-transparent text-charcoal border border-charcoal/12 hover:border-yarn-blue/35'
                     )}
                   >
-                    <Icon size={18} />
+                    <Icon size={16} />
                     {label}
                   </button>
                 ))}
               </div>
             </div>
+            <StitchDivider color="rgba(26,26,26,0.1)" height={12} segmentCount={6} className="mb-5" />
 
             <motion.div
               className="mx-auto cursor-hook"
@@ -300,16 +306,16 @@ export default function SquarePermutator() {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
-            <h3 className="text-lg font-semibold text-charcoal mb-4">Controls</h3>
+        <aside className="space-y-0 border border-charcoal/12 rounded-md bg-canvas-warm/40 divide-y divide-charcoal/10">
+          <div className="p-4">
+            <h3 className="font-display text-xl text-charcoal mb-3">Controls</h3>
             <div className="space-y-3">
               <button
                 onClick={handleGenerate}
                 disabled={isGenerating || (stashEnabled && !stashFeasible)}
                 aria-busy={isGenerating}
                 aria-label={isGenerating ? 'Generating pattern...' : 'Generate new pattern'}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-yarn-blue text-white rounded-lg hover:bg-yarn-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+                className="ui-transition w-full flex items-center justify-center gap-2 px-4 py-2 bg-yarn-blue text-white rounded-md hover:bg-yarn-blue/90 disabled:opacity-50 disabled:cursor-not-allowed font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
               >
                 {isGenerating ? (
                   <YarnSpinner size={18} className="text-white" />
@@ -324,23 +330,23 @@ export default function SquarePermutator() {
                 disabled={!hasPattern || isExporting}
                 aria-busy={isExporting}
                 aria-label={
-                  isExporting ? 'Generating PDF...' : 'Download pattern as PDF'
+                  isExporting ? 'Generating PDF...' : 'Export crochet pattern as PDF'
                 }
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-charcoal/20 text-charcoal rounded-lg hover:bg-charcoal/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+                className="ui-transition w-full flex items-center justify-center gap-2 px-4 py-2 border border-charcoal/20 text-charcoal rounded-md hover:border-yarn-blue/35 disabled:opacity-50 disabled:cursor-not-allowed font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
               >
                 {isExporting ? (
                   <YarnSpinner size={18} className="text-charcoal" />
                 ) : (
                   <Download size={18} />
                 )}
-                {isExporting ? 'Creating PDF...' : 'Download Pattern PDF'}
+                {isExporting ? 'Creating PDF...' : 'Export crochet pattern'}
               </button>
 
               {exportMessage && (
                 <div
                   role="status"
                   className={clsx(
-                    'text-xs p-2 rounded',
+                    'text-xs p-2 rounded-md',
                     exportMessage.type === 'success'
                       ? 'text-accent-green bg-green-50'
                       : 'text-red-600 bg-red-50'
@@ -351,7 +357,7 @@ export default function SquarePermutator() {
               )}
 
               {!lastSuccess && (
-                <div className="text-xs text-red-500 bg-red-50 p-2 rounded">
+                <div className="text-xs text-red-500 bg-red-50 p-2 rounded-md">
                   {stashEnabled && !stashFeasible
                     ? 'Stash totals are too low for this grid. Raise a color limit or disable Stash Buster.'
                     : 'Failed to generate a valid pattern within stash limits. Raise scarce-color limits or try again.'}
@@ -360,10 +366,9 @@ export default function SquarePermutator() {
             </div>
           </div>
 
-          {/* Stash Buster */}
-          <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
+          <div className="p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-charcoal">Stash Buster</h3>
+              <h3 className="font-display text-xl text-charcoal">Stash Buster</h3>
               <label className="flex items-center gap-2 text-sm text-charcoal/70 cursor-pointer">
                 <input
                   type="checkbox"
@@ -374,20 +379,20 @@ export default function SquarePermutator() {
                 Limit yarn
               </label>
             </div>
-            <p className="text-xs text-charcoal/55 mb-3">
-              Cap how many squares each color may use. The generator prefers abundant yarn and
-              never exceeds these caps.
+            <p className="text-sm text-charcoal/60 mb-3">
+              Yarn resources for this layout — the generator prefers abundant colors and respects
+              these caps.
             </p>
             {stashEnabled && (
               <div className="space-y-2">
                 {colors.map((color, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <div
-                      className="w-6 h-6 rounded border border-charcoal/20 shrink-0"
+                      className="w-6 h-6 rounded-full border border-charcoal/20 shrink-0"
                       style={{ backgroundColor: color }}
                       aria-hidden
                     />
-                    <span className="text-xs font-mono text-charcoal/70 w-6">
+                    <span className="type-meta w-6">
                       {COLOR_LABELS[index] || index + 1}
                     </span>
                     <label className="sr-only" htmlFor={`stash-${index}`}>
@@ -400,13 +405,13 @@ export default function SquarePermutator() {
                       max={cellCount}
                       value={stashLimits[index] ?? 0}
                       onChange={(e) => handleStashLimitChange(index, e.target.value)}
-                      className="flex-1 min-w-0 h-8 px-2 text-sm border border-charcoal/15 rounded-lg bg-canvas-white focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue"
+                      className="flex-1 min-w-0 h-8 px-2 text-sm font-mono border border-charcoal/15 rounded-md bg-canvas-white focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue"
                     />
-                    <span className="text-xs text-charcoal/45 shrink-0">max sq</span>
+                    <span className="type-meta shrink-0">max sq</span>
                   </div>
                 ))}
                 {!stashFeasible && (
-                  <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded">
+                  <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded-md">
                     Combined stash ({Object.values(quantityConstraints || {}).reduce((a, b) => a + b, 0)}){' '}
                     is less than {cellCount} squares — raise a limit to generate.
                   </p>
@@ -415,14 +420,15 @@ export default function SquarePermutator() {
             )}
           </div>
 
-          <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
-            <h3 className="text-lg font-semibold text-charcoal mb-4">Color Palette</h3>
-            <div className="grid grid-cols-2 gap-2">
+          <div className="p-4">
+            <h3 className="font-display text-xl text-charcoal mb-3">Yarn palette</h3>
+            <div className="grid grid-cols-2 gap-3">
               {colors.map((color, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <div
-                    className="w-8 h-8 rounded border border-charcoal/20"
+                    className="w-8 h-8 rounded-full border border-charcoal/20 shrink-0 shadow-[inset_0_-6px_8px_rgba(0,0,0,0.08)]"
                     style={{ backgroundColor: color }}
+                    aria-hidden
                   />
                   <input
                     type="color"
@@ -432,7 +438,8 @@ export default function SquarePermutator() {
                       newColors[index] = e.target.value
                       setColors(newColors)
                     }}
-                    className="flex-1 h-8 rounded cursor-hook"
+                    className="flex-1 h-8 rounded-md cursor-hook border border-charcoal/10"
+                    aria-label={`Yarn color ${COLOR_LABELS[index]}`}
                   />
                 </div>
               ))}
@@ -440,8 +447,8 @@ export default function SquarePermutator() {
           </div>
 
           {Object.keys(colorDistribution).length > 0 && (
-            <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
-              <h3 className="text-lg font-semibold text-charcoal mb-4">Color Distribution</h3>
+            <div className="p-4">
+              <h3 className="font-display text-xl text-charcoal mb-3">Color distribution</h3>
               <div className="space-y-2">
                 {Object.entries(colorDistribution).map(([color, count]) => {
                   const max = stashEnabled ? quantityConstraints?.[color] : null
@@ -450,7 +457,7 @@ export default function SquarePermutator() {
                     <div key={color} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <div
-                          className="w-4 h-4 rounded border border-charcoal/20"
+                          className="w-3.5 h-3.5 rounded-full border border-charcoal/20"
                           style={{ backgroundColor: color }}
                         />
                         <span className="text-charcoal/70">
@@ -459,7 +466,7 @@ export default function SquarePermutator() {
                       </div>
                       <span
                         className={clsx(
-                          'font-mono',
+                          'font-mono tabular-nums',
                           over ? 'text-red-600 font-semibold' : 'text-charcoal'
                         )}
                       >
@@ -471,13 +478,13 @@ export default function SquarePermutator() {
               </div>
             </div>
           )}
-        </div>
+        </aside>
       </div>
 
-      <div className="bg-white/80 border border-charcoal/10 rounded-xl p-4 shadow-sm">
-        <h3 className="text-sm font-semibold text-charcoal mb-2">How it works</h3>
-        <StitchDivider color="rgba(26,26,26,0.15)" height={16} segmentCount={8} className="mb-3" />
-        <ul className="text-xs text-charcoal/70 space-y-1 list-disc list-inside">
+      <section className="border-t border-charcoal/10 pt-6">
+        <h3 className="font-display text-xl text-charcoal mb-2">How it works</h3>
+        <StitchDivider color="rgba(26,26,26,0.12)" height={14} segmentCount={8} className="mb-4" />
+        <ul className="text-sm text-charcoal/65 space-y-2 list-disc list-inside max-w-3xl">
           <li>
             Click &quot;Generate Pattern&quot; to create a valid pattern using graph coloring
             algorithms
@@ -493,11 +500,11 @@ export default function SquarePermutator() {
           </li>
           <li>Invalid patterns are highlighted with red borders</li>
           <li>
-            Use &quot;Download Pattern PDF&quot; for a printable grid, row instructions, and yarn
+            Use &quot;Export crochet pattern&quot; for a printable grid, row instructions, and yarn
             estimates
           </li>
         </ul>
-      </div>
+      </section>
     </div>
   )
 }

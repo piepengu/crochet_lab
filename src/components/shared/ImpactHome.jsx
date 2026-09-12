@@ -162,35 +162,30 @@ export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
             Explore the lab
           </motion.h3>
           <StitchDivider color="rgba(26,26,26,0.12)" height={14} segmentCount={8} className="mb-6" />
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-3">
             {MODULES.map(({ id, title, blurb, image, alt }, index) => (
               <motion.button
                 key={id}
                 type="button"
                 onClick={() => onNavigate(id)}
-                className="group text-left overflow-hidden rounded-xl border border-charcoal/10 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
-                initial={{ opacity: 0, y: 20 }}
+                className="group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2 rounded-sm"
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-30px' }}
                 transition={{ duration: 0.45, delay: index * 0.08 }}
-                whileHover={{ y: -3 }}
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-charcoal/5">
+                <div className="relative aspect-[4/3] overflow-hidden bg-charcoal/5 mb-3">
                   <img
                     src={image}
                     alt={alt}
-                    className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                    className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                     loading="lazy"
                   />
-                  <div
-                    className="absolute inset-0 bg-gradient-to-t from-charcoal/55 via-transparent to-transparent opacity-90"
-                    aria-hidden
-                  />
-                  <span className="absolute bottom-3 left-3 right-3 font-display text-lg text-white leading-tight drop-shadow-sm">
-                    {title}
-                  </span>
                 </div>
-                <p className="px-4 py-3 text-xs text-charcoal/55 leading-relaxed">{blurb}</p>
+                <h4 className="font-display text-xl text-charcoal leading-tight mb-1 group-hover:text-yarn-blue ui-transition">
+                  {title}
+                </h4>
+                <p className="text-sm text-charcoal/60 leading-relaxed">{blurb}</p>
               </motion.button>
             ))}
           </div>
@@ -199,21 +194,21 @@ export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
         <section className="mb-12">
           <h3 className="font-display text-2xl text-charcoal mb-2">Who it helps</h3>
           <StitchDivider color="rgba(26,26,26,0.12)" height={14} segmentCount={8} className="mb-6" />
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-3">
             {IMPACT.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="border-l-2 border-yarn-blue/30 pl-4 py-1">
-                <Icon size={20} className="text-yarn-blue mb-2" aria-hidden />
-                <h4 className="font-semibold text-charcoal mb-2">{title}</h4>
-                <p className="text-sm text-charcoal/60 leading-relaxed">{body}</p>
+              <div key={title} className="border-l border-yarn-blue/35 pl-4">
+                <Icon size={18} className="text-yarn-blue mb-2" aria-hidden />
+                <h4 className="font-display text-lg text-charcoal mb-2">{title}</h4>
+                <p className="text-sm text-charcoal/65 leading-relaxed">{body}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="mb-10 flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-charcoal/10 bg-charcoal/[0.03] p-5">
+        <section className="mb-10 border-t border-charcoal/10 pt-8 flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex-1 min-w-0">
             <h3 className="font-display text-xl text-charcoal mb-1">Demo Mode</h3>
-            <p className="text-sm text-charcoal/60 leading-relaxed">
+            <p className="text-sm text-charcoal/65 leading-relaxed max-w-xl">
               Keeps Texture Recognition on fast mock predictions—ideal for presentations. Turn
               it off anytime to run the real on-device MobileNet model.
             </p>
@@ -221,7 +216,7 @@ export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
           <button
             type="button"
             onClick={() => onToggleDemo(!demoMode)}
-            className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-charcoal/15 bg-white text-charcoal text-sm font-medium hover:bg-charcoal/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+            className="ui-transition shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-md border border-charcoal/15 bg-transparent text-charcoal text-sm font-semibold hover:border-yarn-blue/40 hover:text-yarn-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
           >
             <Sparkles size={16} className="text-yarn-blue" />
             {demoMode ? 'Demo Mode on' : 'Enable Demo Mode'}

@@ -109,7 +109,7 @@ export default function Doily3D({
 
   return (
     <div
-      className={`relative z-0 isolate rounded-xl border border-charcoal/10 overflow-hidden bg-[#eef2f6] ${className}`}
+      className={`relative z-0 isolate overflow-hidden bg-[#eef2f6] border border-charcoal/10 rounded-md ${className}`}
       role="img"
       aria-label={`3D lace doily at growth multiplier ${labelMultiplier.toFixed(2)}. Auto-rotating; drag to take control. Blue rings stay flatter; green outer rings show ruffle from excess stitches.`}
     >
