@@ -3,15 +3,27 @@
 @source "../index.html";
 @source "./**/*.{js,jsx}";
 
+/*
+  Type roles
+  - display (Instrument Serif): titles, editorial headings
+  - sans (Source Sans 3): body, instructions, explanations
+  - mono (Space Mono): controls, numbers, formulas, metadata, stitch counts
+*/
 @theme {
-  --font-mono: "Space Mono", "Courier Prime", monospace;
-  --font-sans: "Space Mono", "Courier Prime", monospace;
-  --font-display: "Instrument Serif", Georgia, serif;
+  --font-mono: "Space Mono", "Courier Prime", ui-monospace, monospace;
+  --font-sans: "Source Sans 3", "Source Sans Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
 
   --color-canvas-white: #fafafa;
+  --color-canvas-warm: #fafaf8;
   --color-charcoal: #1a1a1a;
+  --color-ink-muted: #5a5a5a;
   --color-yarn-blue: #4a90e2;
   --color-accent-green: #2ecc71;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
 
   --spacing-18: 4.5rem;
   --spacing-88: 22rem;
@@ -23,11 +35,27 @@
     scroll-behavior: smooth;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
   body {
-    @apply font-mono text-charcoal;
-    background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+    @apply font-sans text-charcoal antialiased;
+    background: linear-gradient(180deg, #fafaf8 0%, #f3f3f1 100%);
     min-height: 100vh;
     position: relative;
+    font-size: 1rem;
+    line-height: 1.6;
   }
 
   /* Procedural noise overlay - paper/fabric grain */
@@ -38,10 +66,36 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
-    opacity: 0.04;
+    opacity: 0.035;
     mix-blend-mode: overlay;
     z-index: 9999;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-normal tracking-tight text-charcoal;
+    line-height: 1.15;
+  }
+
+  p {
+    @apply text-charcoal/70;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    @apply font-sans;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    @apply font-mono;
   }
 
   .skip-link {
@@ -51,9 +105,9 @@
     padding: 0.75rem 1.5rem;
     background: #4a90e2;
     color: white;
-    font-weight: 500;
+    font-weight: 600;
     border-radius: 0.5rem;
-    transition: left 0.2s;
+    transition: left 0.15s ease;
   }
 
   .skip-link:focus {
@@ -96,6 +150,26 @@
 }
 
 @layer utilities {
+  /* Computational / metadata labels */
+  .type-label {
+    @apply font-mono text-[10px] uppercase tracking-[0.18em] text-charcoal/50;
+  }
+
+  .type-meta {
+    @apply font-mono text-xs text-charcoal/55 tabular-nums;
+  }
+
+  /* Soft control transitions (respect reduced-motion via base) */
+  .ui-transition {
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease,
+      opacity 150ms ease,
+      box-shadow 150ms ease,
+      transform 150ms ease;
+  }
+
   .cursor-hook {
     cursor:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath fill='none' stroke='%231a1a1a' stroke-width='2.2' stroke-linecap='round' d='M9 3v15c0 3.2 2.6 5.8 5.8 5.8s5.8-2.6 5.8-5.8'/%3E%3Ccircle cx='9' cy='5' r='2.5' fill='%234A90E2'/%3E%3C/svg%3E")
