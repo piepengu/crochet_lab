@@ -123,18 +123,27 @@ export function isStashFeasible(cellCount, colors, quantityConstraints) {
 }
 
 /**
- * Sort colors preferring those with more remaining stash (then random among ties)
+ * Sort colors for assignment:
+ * 1. Prefer colors still within stash limits
+ * 2. Prefer least-used colors (so A–D all appear, not just A/B)
+ * 3. Break ties randomly
  */
 function orderColorsByStash(colors, quantityConstraints, usage) {
   const shuffled = shuffleArray(colors)
-  if (!quantityConstraints) return shuffled
 
   return shuffled.sort((a, b) => {
-    const limA = quantityConstraints[a]
-    const limB = quantityConstraints[b]
-    const remA = limA == null ? Infinity : limA - (usage[a] || 0)
-    const remB = limB == null ? Infinity : limB - (usage[b] || 0)
-    return remB - remA
+    const usedA = usage[a] || 0
+    const usedB = usage[b] || 0
+
+    if (quantityConstraints) {
+      const limA = quantityConstraints[a]
+      const limB = quantityConstraints[b]
+      const remA = limA == null ? Infinity : limA - usedA
+      const remB = limB == null ? Infinity : limB - usedB
+      if (remA !== remB) return remB - remA
+    }
+
+    return usedA - usedB
   })
 }
 

@@ -92,12 +92,23 @@ export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
           }}
           aria-hidden
         />
-        {/* Soft vignette only — no white haze */}
+        {/* Soft vignette + slight right darkening for crochet texture contrast */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
-            background:
-              'radial-gradient(ellipse 70% 80% at 85% 40%, transparent 40%, rgba(26,26,26,0.12) 100%)',
+            background: `
+              linear-gradient(
+                90deg,
+                transparent 48%,
+                rgba(26,26,26,0.05) 72%,
+                rgba(26,26,26,0.12) 100%
+              ),
+              radial-gradient(
+                ellipse 70% 80% at 85% 40%,
+                transparent 35%,
+                rgba(26,26,26,0.16) 100%
+              )
+            `,
           }}
           aria-hidden
         />
@@ -142,7 +153,7 @@ export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
                 onClick={() => onNavigate('squares')}
                 className="ui-transition px-6 py-3 rounded-md border border-charcoal/20 bg-canvas-warm/80 text-charcoal text-sm font-semibold hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
               >
-                See patterns
+                Explore patterns
               </button>
             </div>
           </motion.div>

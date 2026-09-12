@@ -57,8 +57,12 @@ export default function SquarePermutator() {
     defaultStashLimits(DEFAULT_COLORS, 9)
   )
   const [patternKey, setPatternKey] = useState(0)
+  const [selectedYarnIndex, setSelectedYarnIndex] = useState(0)
+  const [paintFeedback, setPaintFeedback] = useState(null)
 
   const cellCount = gridSize * gridSize
+  const selectedYarn = colors[selectedYarnIndex]
+  const selectedYarnLabel = COLOR_LABELS[selectedYarnIndex] || String(selectedYarnIndex + 1)
 
   const quantityConstraints = useMemo(() => {
     if (!stashEnabled) return null
@@ -74,6 +78,7 @@ export default function SquarePermutator() {
   const handleGenerate = useCallback(() => {
     setIsGenerating(true)
     setAttempts(0)
+    setPaintFeedback(null)
 
     setTimeout(() => {
       const result = generateValidPattern(gridSize, colors, 5000, quantityConstraints)
@@ -86,32 +91,42 @@ export default function SquarePermutator() {
   }, [gridSize, colors, quantityConstraints])
 
   const handleSquareClick = (row, col) => {
+    const candidate = selectedYarn
+    if (!candidate) return
+
     const newGrid = grid.map((r) => [...r])
-    const currentColor = newGrid[row][col]
-    const currentIndex = colors.indexOf(currentColor)
-    let nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % colors.length
+    const previous = newGrid[row][col]
 
-    for (let tryCount = 0; tryCount < colors.length; tryCount++) {
-      const candidate = colors[nextIndex]
-      newGrid[row][col] = candidate
-
-      if (!isValidColoring(newGrid, row, col, candidate)) {
-        nextIndex = (nextIndex + 1) % colors.length
-        continue
-      }
-
-      if (stashEnabled && quantityConstraints) {
-        const usage = countColorDistribution(newGrid)
-        const max = quantityConstraints[candidate]
-        if (max != null && (usage[candidate] || 0) > max) {
-          nextIndex = (nextIndex + 1) % colors.length
-          continue
-        }
-      }
-
+    // Clicking the same yarn again clears the square
+    if (previous === candidate) {
+      newGrid[row][col] = null
       setGrid(newGrid)
+      setPaintFeedback(null)
       return
     }
+
+    if (!isValidColoring(newGrid, row, col, candidate)) {
+      setPaintFeedback(
+        `Yarn ${selectedYarnLabel} cannot sit next to another ${selectedYarnLabel}.`
+      )
+      return
+    }
+
+    newGrid[row][col] = candidate
+
+    if (stashEnabled && quantityConstraints) {
+      const usage = countColorDistribution(newGrid)
+      const max = quantityConstraints[candidate]
+      if (max != null && (usage[candidate] || 0) > max) {
+        setPaintFeedback(
+          `Yarn ${selectedYarnLabel} is at its stash limit (${max} squares).`
+        )
+        return
+      }
+    }
+
+    setGrid(newGrid)
+    setPaintFeedback(null)
   }
 
   const handleSizeChange = (newSize) => {
@@ -195,7 +210,7 @@ export default function SquarePermutator() {
               <div>
                 <h3 className="font-display text-2xl text-charcoal">Pattern Grid</h3>
                 <p className="text-sm text-charcoal/60 mt-1">
-                  Color a modular crochet layout under graph-coloring constraints.
+                  Select a yarn, then click squares to paint. No neighbors share a color.
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -294,7 +309,20 @@ export default function SquarePermutator() {
               )}
             </motion.div>
 
-            <div className="mt-4 flex items-center justify-between text-sm">
+            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+              <span className="type-meta">
+                Painting with{' '}
+                <span className="font-semibold text-charcoal">Yarn {selectedYarnLabel}</span>
+                {' — '}select a yarn, then click a square. Click again to clear.
+              </span>
+              {paintFeedback && (
+                <span className="text-amber-800 text-xs bg-amber-50 px-2 py-0.5 rounded-md">
+                  {paintFeedback}
+                </span>
+              )}
+            </div>
+
+            <div className="mt-3 flex items-center justify-between text-sm">
               <div className="flex flex-wrap items-center gap-4">
                 <span
                   className={`font-semibold ${
@@ -400,11 +428,12 @@ export default function SquarePermutator() {
               </label>
             </div>
             <p className="text-sm text-charcoal/60 mb-4">
-              These swatches feed the pattern grid. With Stash Buster on, thread length shows how
-              much of each yarn you allow.
+              Select a yarn to paint with, then click squares on the grid. Use the color chip to
+              change shade only. With Limit yarn on, thread length shows how much of each yarn you
+              allow.
             </p>
 
-            <div className="space-y-4">
+            <div className="space-y-4" role="radiogroup" aria-label="Select yarn to paint">
               {colors.map((color, index) => {
                 const used = colorDistribution[color] || 0
                 const max = stashEnabled ? stashLimits[index] ?? 0 : cellCount
@@ -414,18 +443,46 @@ export default function SquarePermutator() {
                 )
                 const usedPct = Math.round((used / cellCount) * 100)
                 const over = stashEnabled && used > max
+                const isSelected = selectedYarnIndex === index
 
                 return (
                   <div key={index} className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <div
-                        className="yarn-swatch w-9 h-9 shrink-0"
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={isSelected}
+                        aria-label={`Select yarn ${COLOR_LABELS[index]} to paint`}
+                        onClick={() => {
+                          setSelectedYarnIndex(index)
+                          setPaintFeedback(null)
+                        }}
+                        className={clsx(
+                          'yarn-swatch w-9 h-9 shrink-0 ui-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2',
+                          isSelected
+                            ? 'ring-2 ring-yarn-blue ring-offset-2'
+                            : 'hover:ring-2 hover:ring-charcoal/20 hover:ring-offset-1'
+                        )}
                         style={{ backgroundColor: color }}
-                        aria-hidden
                       />
-                      <div className="min-w-0 flex-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedYarnIndex(index)
+                          setPaintFeedback(null)
+                        }}
+                        className="min-w-0 flex-1 text-left rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+                      >
                         <div className="flex items-center justify-between gap-2 mb-1">
-                          <span className="type-meta">Yarn {COLOR_LABELS[index]}</span>
+                          <span
+                            className={clsx(
+                              'type-meta',
+                              isSelected && 'text-charcoal font-semibold'
+                            )}
+                          >
+                            Yarn {COLOR_LABELS[index]}
+                            {isSelected ? ' · painting' : ''}
+                          </span>
                           <span
                             className={clsx(
                               'type-meta',
@@ -448,17 +505,28 @@ export default function SquarePermutator() {
                             }}
                           />
                         </div>
-                      </div>
+                      </button>
                       <input
                         type="color"
                         value={color}
+                        onClick={(e) => e.stopPropagation()}
                         onChange={(e) => {
+                          const next = e.target.value
+                          const previous = colors[index]
                           const newColors = [...colors]
-                          newColors[index] = e.target.value
+                          newColors[index] = next
                           setColors(newColors)
+                          if (previous !== next) {
+                            setGrid((g) =>
+                              g.map((row) =>
+                                row.map((cell) => (cell === previous ? next : cell))
+                              )
+                            )
+                          }
                         }}
                         className="w-9 h-9 rounded-md cursor-hook border border-charcoal/10 shrink-0"
-                        aria-label={`Pick yarn color ${COLOR_LABELS[index]}`}
+                        aria-label={`Pick shade for yarn ${COLOR_LABELS[index]}`}
+                        title="Change shade"
                       />
                     </div>
 
@@ -502,7 +570,10 @@ export default function SquarePermutator() {
             Click &quot;Generate Pattern&quot; to assign yarn colors with a graph-coloring
             algorithm
           </li>
-          <li>Click any square to cycle its yarn color</li>
+          <li>
+            Select yarn A–D in Yarn resources, then click a square to paint it (click again to
+            clear)
+          </li>
           <li>No two adjacent squares (horizontal/vertical) may share the same color</li>
           <li>
             Enable <strong>Limit yarn</strong> to cap squares per yarn — scarce colors are used
