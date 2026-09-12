@@ -12,7 +12,16 @@ import {
   Filler,
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
-import { RotateCcw, Info } from 'lucide-react'
+import { useReducedMotion } from 'framer-motion'
+import {
+  RotateCcw,
+  Info,
+  SlidersHorizontal,
+  TrendingUp,
+  Orbit,
+  Rows3,
+  ArrowRight,
+} from 'lucide-react'
 import StitchDivider from '../shared/StitchDivider'
 import YarnSpinner from '../shared/YarnSpinner'
 import {
@@ -37,6 +46,7 @@ ChartJS.register(
 )
 
 export default function DoilyGraph() {
+  const reduceMotion = useReducedMotion()
   const [multiplier, setMultiplier] = useState(1.0)
   const debouncedMultiplier = useDebounce(multiplier, 80)
   const [showInfo, setShowInfo] = useState(false)
@@ -68,6 +78,7 @@ export default function DoilyGraph() {
     () => generateStitchPattern(maxRows, debouncedMultiplier, baseStitches),
     [debouncedMultiplier]
   )
+  const outerStitches = stitchPattern[stitchPattern.length - 1]?.stitches ?? 0
 
   const showHyperbolicLine = Math.abs(debouncedMultiplier - 1.0) > 0.02
 
@@ -129,6 +140,10 @@ export default function DoilyGraph() {
       responsive: true,
       maintainAspectRatio: false,
       resizeDelay: 0,
+      animation: {
+        duration: reduceMotion ? 0 : 220,
+        easing: 'easeOutQuart',
+      },
       plugins: {
         legend: {
           position: 'top',
@@ -231,7 +246,7 @@ export default function DoilyGraph() {
         },
       },
     }),
-    [showHyperbolicLine]
+    [showHyperbolicLine, reduceMotion]
   )
 
   const handleReset = () => {
@@ -249,9 +264,65 @@ export default function DoilyGraph() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
+      {/* Live causal map: input → model → form → instructions */}
+      <ol
+        className="grid grid-cols-2 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] gap-2 lg:gap-3 items-stretch mb-7 border-y border-charcoal/10 py-3"
+        aria-label="How the growth multiplier becomes a crochet pattern"
+      >
+        {[
+          {
+            icon: SlidersHorizontal,
+            label: 'Input',
+            title: 'Multiplier',
+            value: `×${multiplier.toFixed(2)}`,
+          },
+          {
+            icon: TrendingUp,
+            label: 'Model',
+            title: 'Growth curve',
+            value: showHyperbolicLine ? 'Exponential blend' : 'Linear',
+          },
+          {
+            icon: Orbit,
+            label: 'Form',
+            title: '3D surface',
+            value: surfaceType,
+          },
+          {
+            icon: Rows3,
+            label: 'Output',
+            title: 'Hook pattern',
+            value: `${outerStitches} outer sts`,
+          },
+        ].flatMap((step, index, steps) => {
+          const Icon = step.icon
+          const item = (
+            <li key={step.label} className="flex items-start gap-3 min-w-0 px-1">
+              <Icon size={17} className="mt-1 text-yarn-blue shrink-0" aria-hidden />
+              <div className="min-w-0">
+                <p className="type-label">{step.label}</p>
+                <p className="font-display text-lg text-charcoal leading-tight">{step.title}</p>
+                <p className="type-meta truncate">{step.value}</p>
+              </div>
+            </li>
+          )
+          if (index === steps.length - 1) return [item]
+          return [
+            item,
+            <li
+              key={`${step.label}-arrow`}
+              className="hidden lg:flex items-center justify-center text-charcoal/25"
+              aria-hidden
+            >
+              <ArrowRight size={16} />
+            </li>,
+          ]
+        })}
+      </ol>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] gap-5 lg:gap-8 mb-5">
         <div className="space-y-3">
-          <div>
+          <div id="radial-surface">
             <p className="type-label mb-2">3D hyperbolic surface</p>
             <Suspense
               fallback={
@@ -317,7 +388,7 @@ export default function DoilyGraph() {
           </div>
         </div>
 
-        <div>
+        <div id="radial-curve">
           <p className="type-label mb-2">Stitch growth chart</p>
           <div
             ref={chartContainerRef}
@@ -334,7 +405,10 @@ export default function DoilyGraph() {
       </div>
 
       {/* Controls — tool surface */}
-      <div className="border border-charcoal/12 rounded-md p-5 lg:p-6 mb-8 bg-canvas-warm/60">
+      <div
+        id="radial-controls"
+        className="border border-charcoal/12 rounded-md p-5 lg:p-6 mb-8 bg-canvas-warm/60"
+      >
         <div className="flex flex-col lg:flex-row lg:items-center gap-6">
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
@@ -471,7 +545,7 @@ export default function DoilyGraph() {
       </div>
 
       {/* Generated stitch pattern */}
-      <section className="mb-10">
+      <section id="radial-pattern" className="mb-10 scroll-mt-24">
         <div className="flex flex-wrap items-baseline justify-between gap-2 mb-2">
           <h3 className="font-display text-2xl text-charcoal">Generated Stitch Pattern</h3>
           <p className="type-meta">
@@ -503,7 +577,7 @@ export default function DoilyGraph() {
             <div>
               <div className="type-label mb-1">Outer row</div>
               <div className="font-mono text-sm text-charcoal tabular-nums">
-                {stitchPattern[stitchPattern.length - 1]?.stitches ?? 0} sts
+                {outerStitches} sts
               </div>
             </div>
           </div>

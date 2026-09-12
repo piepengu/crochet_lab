@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Bounds } from '@react-three/drei'
+import { useReducedMotion } from 'framer-motion'
 import * as THREE from 'three'
 import { DoubleSide } from 'three'
 import { generateDoilyMeshGeometry } from '../../utils/doilyMath'
@@ -105,15 +106,20 @@ export default function Doily3D({
   className = '',
 }) {
   const labelMultiplier = displayMultiplier ?? multiplier
-  const [autoRotate, setAutoRotate] = useState(true)
+  const reduceMotion = useReducedMotion()
+  const [autoRotate, setAutoRotate] = useState(() => !reduceMotion)
+
+  useEffect(() => {
+    if (reduceMotion) setAutoRotate(false)
+  }, [reduceMotion])
 
   return (
     <div
       className={`relative z-0 isolate overflow-hidden bg-[#eef2f6] border border-charcoal/10 rounded-md ${className}`}
       role="img"
-      aria-label={`3D lace doily at growth multiplier ${labelMultiplier.toFixed(2)}. Auto-rotating; drag to take control. Blue rings stay flatter; green outer rings show ruffle from excess stitches.`}
+      aria-label={`3D lace doily at growth multiplier ${labelMultiplier.toFixed(2)}. ${autoRotate ? 'Auto-rotating; drag to take control.' : 'Drag to rotate.'} Blue rings stay flatter; green outer rings show ruffle from excess stitches.`}
     >
-      <div className="relative z-0 w-full h-[220px] sm:h-[260px] md:h-[min(320px,36vh)] max-h-[360px]">
+      <div className="relative z-0 w-full h-[280px] sm:h-[340px] lg:h-[min(430px,52vh)] max-h-[460px] cursor-grab active:cursor-grabbing">
         <Canvas
           className="!relative touch-none"
           camera={{ position: [2.4, 1.9, 2.9], fov: 42, near: 0.1, far: 100 }}
