@@ -71,11 +71,11 @@ export default function Sidebar({ activeModule, onModuleChange }) {
           'lg:border-r-0 lg:border-b lg:shadow-[0_1px_0_rgba(26,26,26,0.06)]',
           'lg:bg-gradient-to-r lg:from-[#eef3f8] lg:via-white lg:to-white',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-          'w-[19rem] flex flex-col lg:flex-row lg:items-center lg:justify-between lg:px-6 lg:py-4 shrink-0'
+          'w-[19rem] flex flex-col lg:flex-row lg:items-center lg:justify-between lg:px-5 xl:px-6 lg:py-2 shrink-0'
         )}
       >
         {/* Desktop brand */}
-        <div className="hidden lg:block lg:border-r lg:border-charcoal/10 lg:pr-7 lg:py-1 lg:min-w-[300px]">
+        <div className="hidden lg:block lg:border-r lg:border-charcoal/12 lg:pr-5 lg:py-0.5 lg:min-w-[275px]">
           <BrandMark compact titleAs="h1" />
         </div>
 
@@ -94,10 +94,10 @@ export default function Sidebar({ activeModule, onModuleChange }) {
         </div>
 
         <nav
-          className="flex-1 overflow-y-auto p-4 lg:flex-1 lg:overflow-visible lg:p-0 lg:pl-6"
+          className="flex-1 overflow-y-auto p-4 lg:flex-1 lg:overflow-visible lg:p-0 lg:pl-5"
           aria-label="Module navigation"
         >
-          <ul className="flex flex-col gap-2 list-none lg:flex-row lg:gap-2.5 lg:flex-1 lg:justify-end">
+          <ul className="flex flex-col gap-2 list-none lg:flex-row lg:gap-1.5 xl:gap-2 lg:flex-1 lg:justify-end">
             {navigationItems.map((item) => {
               const Icon = item.icon
               const isActive = activeModule === item.id
@@ -108,11 +108,11 @@ export default function Sidebar({ activeModule, onModuleChange }) {
                     onClick={() => handleNavClick(item.id)}
                     aria-current={isActive ? 'page' : undefined}
                     className={clsx(
-                      'w-full flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-200 text-center',
-                      'lg:flex-row lg:justify-center lg:gap-2 lg:py-2.5 lg:px-3',
+                      'w-full flex flex-col items-center gap-2 p-4 rounded-lg ui-transition text-center',
+                      'lg:flex-row lg:justify-center lg:gap-2 lg:py-2 lg:px-2.5',
                       isActive
                         ? 'bg-yarn-blue text-white'
-                        : 'bg-white/70 text-charcoal/70 border border-charcoal/10 hover:border-charcoal/20 hover:text-charcoal hover:bg-white'
+                        : 'bg-transparent text-charcoal/60 border border-transparent hover:border-charcoal/10 hover:text-charcoal hover:bg-white/65'
                     )}
                   >
                     <Icon
