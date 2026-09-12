@@ -222,25 +222,26 @@ export default function TextureScanner({ demoMode = false }) {
         </p>
       </div>
 
-      {/* Model Status */}
+      {/* Instrument status */}
       {modelLoading && !useMockMode && (
-        <div className="mb-4 p-4 bg-yarn-blue/10 border border-yarn-blue/20 rounded-lg">
+        <div className="mb-4 py-3 border-y border-yarn-blue/20">
           <div className="flex items-center gap-2 text-yarn-blue">
             <YarnSpinner size={22} />
-            <span className="text-sm font-medium">Loading AI model...</span>
+            <span className="text-sm font-semibold">Calibrating image model…</span>
           </div>
         </div>
       )}
 
       {modelError && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="mb-4 p-4 bg-red-50 border-l-2 border-red-400">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-red-600">
               <span className="text-sm font-medium">Model loading failed: {modelError}</span>
             </div>
             <button
+              type="button"
               onClick={() => setUseMockMode(true)}
-              className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+              className="ui-transition text-xs px-2 py-1 text-red-700 border border-red-200 rounded-md hover:bg-red-100"
             >
               Use Mock Mode
             </button>
@@ -249,7 +250,7 @@ export default function TextureScanner({ demoMode = false }) {
       )}
 
       {/* Mock Mode Toggle */}
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-5 flex items-center gap-2 border-b border-charcoal/10 pb-4">
         <label className="flex items-center gap-2 text-sm text-charcoal/70 cursor-pointer">
           <input
             type="checkbox"
@@ -265,7 +266,7 @@ export default function TextureScanner({ demoMode = false }) {
             }}
             className="rounded"
           />
-          <span>
+          <span className="text-sm">
             {demoMode
               ? 'Mock mode (Demo Mode — recommended for presentations)'
               : 'Use mock mode (for faster demos)'}
@@ -292,20 +293,21 @@ export default function TextureScanner({ demoMode = false }) {
                 htmlFor={fileInputId}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
-                className="border-2 border-dashed border-charcoal/20 rounded-lg p-12 text-center hover:border-yarn-blue/50 transition-colors cursor-pointer bg-canvas-white block"
+                className="ui-transition border border-dashed border-charcoal/25 rounded-md p-10 sm:p-12 text-center hover:border-yarn-blue/60 cursor-pointer bg-canvas-warm/40 block"
               >
-                <Upload size={48} className="mx-auto mb-4 text-charcoal/30" />
-                <h3 className="text-lg font-semibold text-charcoal mb-2">
+                <Upload size={42} className="mx-auto mb-4 text-yarn-blue/65" />
+                <p className="type-label mb-2">Image specimen</p>
+                <h3 className="font-display text-2xl text-charcoal mb-2">
                   Drag & drop an image here
                 </h3>
                 <p className="text-sm text-charcoal/60 mb-4">or click to browse</p>
-                <p className="text-xs text-charcoal/50">Supports: JPG, PNG, WebP</p>
+                <p className="type-meta">JPG · PNG · WebP</p>
               </label>
             </>
           ) : (
-            <div style={{ backgroundColor: '#fff', border: '2px solid #333', borderRadius: '8px', padding: '16px' }}>
+            <div className="border border-charcoal/12 rounded-md p-4 bg-canvas-warm/40">
               {/* Image Preview with Zoom */}
-              <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px', backgroundColor: '#f0f0f0', marginBottom: '16px', height: '300px', maxHeight: '300px' }}>
+              <div className="relative overflow-hidden rounded-sm bg-charcoal/[0.04] mb-4 h-[300px] max-h-[300px]">
                 <img
                   ref={imageRef}
                   src={imageUrl}
@@ -335,7 +337,7 @@ export default function TextureScanner({ demoMode = false }) {
                       await buildHeatmap(imageRef.current)
                     }
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-charcoal/20 hover:bg-charcoal/5 transition-colors"
+                  className="ui-transition flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md border border-charcoal/20 hover:border-yarn-blue/40 hover:text-yarn-blue"
                   aria-pressed={showHeatmap}
                 >
                   {showHeatmap ? <Eye size={14} /> : <EyeOff size={14} />}
@@ -357,7 +359,7 @@ export default function TextureScanner({ demoMode = false }) {
                   <button
                     onClick={handleZoomOut}
                     disabled={zoom <= 0.5}
-                    className="p-2 rounded-lg border border-charcoal/20 hover:bg-charcoal/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="ui-transition p-2 rounded-md border border-charcoal/20 hover:border-yarn-blue/40 disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label="Zoom out"
                   >
                     <ZoomOut size={18} />
@@ -368,14 +370,14 @@ export default function TextureScanner({ demoMode = false }) {
                   <button
                     onClick={handleZoomIn}
                     disabled={zoom >= 3}
-                    className="p-2 rounded-lg border border-charcoal/20 hover:bg-charcoal/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="ui-transition p-2 rounded-md border border-charcoal/20 hover:border-yarn-blue/40 disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label="Zoom in"
                   >
                     <ZoomIn size={18} />
                   </button>
                   <button
                     onClick={handleZoomReset}
-                    className="p-2 rounded-lg border border-charcoal/20 hover:bg-charcoal/5 transition-colors"
+                    className="ui-transition p-2 rounded-md border border-charcoal/20 hover:border-yarn-blue/40"
                     aria-label="Reset zoom"
                   >
                     <RotateCcw size={18} />
@@ -383,7 +385,7 @@ export default function TextureScanner({ demoMode = false }) {
                 </div>
                 <button
                   onClick={handleClear}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-charcoal/70 hover:text-charcoal hover:bg-charcoal/5 rounded-lg transition-colors"
+                  className="ui-transition flex items-center gap-2 px-3 py-2 text-sm text-charcoal/70 hover:text-charcoal rounded-md"
                 >
                   <X size={16} />
                   Clear
@@ -394,7 +396,7 @@ export default function TextureScanner({ demoMode = false }) {
 
           {/* Classification Status */}
           {classifying && (
-            <div className="p-4 bg-yarn-blue/10 border border-yarn-blue/20 rounded-lg">
+            <div className="p-4 bg-yarn-blue/[0.06] border-l-2 border-yarn-blue">
               <div className="flex items-center gap-2 text-yarn-blue">
                 <YarnSpinner size={22} />
                 <span className="text-sm font-medium">Analyzing image...</span>
@@ -403,7 +405,7 @@ export default function TextureScanner({ demoMode = false }) {
           )}
 
           {classificationError && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="p-4 bg-red-50 border-l-2 border-red-400">
               <p className="text-sm text-red-600">{classificationError}</p>
             </div>
           )}
@@ -412,39 +414,64 @@ export default function TextureScanner({ demoMode = false }) {
         {/* Results Section */}
         <div className="flex flex-col gap-4 min-w-0">
           {predictions ? (
-            <div className="bg-charcoal text-accent-green rounded-lg p-6 font-mono">
-              <h3 className="text-lg font-bold mb-4 text-accent-green">Classification Results</h3>
-              <div className="space-y-4">
+            <section className="border border-charcoal/15 rounded-md bg-[#f1f3f3] overflow-hidden">
+              <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-charcoal/10 bg-[#e8ecec]">
+                <div>
+                  <p className="type-label mb-1">Scientific instrument · image classifier</p>
+                  <h3 className="font-display text-2xl text-charcoal">Classification results</h3>
+                </div>
+                <span className="inline-flex items-center gap-1.5 type-meta text-charcoal/65">
+                  <span className="w-2 h-2 rounded-full bg-accent-green" aria-hidden />
+                  Analysis complete
+                </span>
+              </div>
+
+              <div className="p-5 sm:p-6 space-y-5">
                 {predictions.map((pred, index) => (
                   <div key={index} className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-accent-green">{pred.className}</span>
-                      <span className="text-accent-green/80">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <div className="flex items-baseline gap-3 min-w-0">
+                        <span className="type-meta text-charcoal/45">
+                          0{index + 1}
+                        </span>
+                        <span className={index === 0 ? 'font-semibold text-charcoal' : 'text-charcoal/70'}>
+                          {pred.className}
+                        </span>
+                      </div>
+                      <span className="font-mono text-sm tabular-nums text-charcoal">
                         {(pred.probability * 100).toFixed(1)}%
                       </span>
                     </div>
                     {/* Probability Bar */}
-                    <div className="w-full bg-charcoal/50 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="w-full bg-charcoal/[0.08] h-2 overflow-hidden"
+                      role="progressbar"
+                      aria-label={`${pred.className} confidence`}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={Math.round(pred.probability * 100)}
+                    >
                       <div
-                        className="h-full bg-accent-green transition-all duration-500"
+                        className={`h-full ui-transition ${
+                          index === 0 ? 'bg-yarn-blue' : 'bg-yarn-blue/45'
+                        }`}
                         style={{ width: `${pred.probability * 100}%` }}
                       />
                     </div>
                   </div>
                 ))}
-              </div>
 
-              {/* Confidence Indicator */}
-              <div className="mt-6 pt-4 border-t border-accent-green/20">
-                <div className="flex items-center justify-between text-xs text-accent-green/80">
-                  <span>Confidence:</span>
+                {/* Confidence Indicator */}
+                <div className="pt-4 border-t border-charcoal/10">
+                  <div className="flex items-center justify-between type-meta">
+                    <span>Overall confidence</span>
                   <span
                     className={
                       predictions[0].probability > 0.7
-                        ? 'text-accent-green font-bold'
+                          ? 'text-accent-green font-bold'
                         : predictions[0].probability > 0.4
                           ? 'text-yarn-blue'
-                          : 'text-yellow-500'
+                          : 'text-amber-700'
                     }
                   >
                     {predictions[0].probability > 0.7
@@ -453,41 +480,36 @@ export default function TextureScanner({ demoMode = false }) {
                         ? 'Medium'
                         : 'Low'}
                   </span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Re-classify Button */}
-              <button
-                onClick={handleReclassify}
-                disabled={classifying}
-                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-accent-green/20 text-accent-green rounded-lg hover:bg-accent-green/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-              >
-                <RotateCcw size={16} />
-                Re-classify
-              </button>
-            </div>
+                {/* Re-classify Button */}
+                <button
+                  type="button"
+                  onClick={handleReclassify}
+                  disabled={classifying}
+                  className="ui-transition w-full flex items-center justify-center gap-2 px-4 py-2 bg-yarn-blue text-white rounded-md hover:bg-yarn-blue/90 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold"
+                >
+                  <RotateCcw size={16} />
+                  Analyze again
+                </button>
+              </div>
+            </section>
           ) : (
-            <div style={{ backgroundColor: '#fafafa', border: '2px solid #ddd', borderRadius: '8px', padding: '48px', textAlign: 'center' }}>
-              <p style={{ color: '#666', fontSize: '14px', marginBottom: '16px' }}>
+            <div className="min-h-[300px] border border-charcoal/12 rounded-md bg-[#f1f3f3] p-10 flex flex-col items-center justify-center text-center">
+              <p className="type-label mb-3">Classification output</p>
+              <p className="text-sm text-charcoal/60 mb-5 max-w-xs">
                 {imageUrl
                   ? 'Classification results will appear here'
                   : 'Upload an image to see classification results'}
               </p>
               {imageUrl && !classifying && (
                 <button
+                  type="button"
                   onClick={handleReclassify}
-                  style={{ 
-                    padding: '12px 24px', 
-                    backgroundColor: '#4A90E2', 
-                    color: 'white', 
-                    border: 'none',
-                    borderRadius: '8px', 
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    fontSize: '16px'
-                  }}
+                  className="ui-transition px-5 py-2.5 bg-yarn-blue text-white rounded-md hover:bg-yarn-blue/90 font-semibold"
                 >
-                  Classify Image
+                  Analyze image
                 </button>
               )}
             </div>
@@ -495,11 +517,11 @@ export default function TextureScanner({ demoMode = false }) {
         </div>
       </div>
 
-      {/* Instructions */}
-      <div className="bg-canvas-white border border-charcoal/10 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-charcoal mb-2">How it works</h3>
+      {/* Open editorial instructions */}
+      <section className="border-t border-charcoal/10 pt-6">
+        <h3 className="font-display text-xl text-charcoal mb-2">How it works</h3>
         <StitchDivider color="rgba(26,26,26,0.15)" height={16} segmentCount={8} className="mb-3" />
-        <ul className="text-xs text-charcoal/70 space-y-1 list-disc list-inside">
+        <ul className="text-sm text-charcoal/65 space-y-2 list-disc list-inside max-w-3xl">
           <li>Upload an image of crochet work or textured fabric</li>
           <li>The AI model will automatically analyze and classify the texture</li>
           <li>Results show the top 3 predictions with confidence percentages</li>
@@ -510,7 +532,7 @@ export default function TextureScanner({ demoMode = false }) {
             patterns)
           </li>
         </ul>
-      </div>
+      </section>
     </div>
   )
 }
