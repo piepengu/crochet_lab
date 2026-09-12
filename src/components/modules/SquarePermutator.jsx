@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import clsx from 'clsx'
 import { RefreshCw, Grid3x3, Square, Grid, Download } from 'lucide-react'
 import StitchDivider from '../shared/StitchDivider'
@@ -23,7 +23,6 @@ const GRID_SIZES = [
 ]
 
 function defaultStashLimits(colors, cellCount) {
-  // Abundant → scarce: first colors get more of the stash
   return colors.map((_, i) => {
     if (i === 0) return cellCount
     if (i === 1) return Math.max(1, Math.ceil(cellCount * 0.45))
@@ -32,7 +31,19 @@ function defaultStashLimits(colors, cellCount) {
   })
 }
 
+function yarnCellBackground(color) {
+  return `
+    radial-gradient(circle at 32% 28%, color-mix(in srgb, ${color} 72%, white), ${color} 58%),
+    repeating-linear-gradient(
+      125deg,
+      transparent 0 2px,
+      color-mix(in srgb, ${color} 82%, #1a1a1a) 2px 3px
+    )
+  `
+}
+
 export default function SquarePermutator() {
+  const reduceMotion = useReducedMotion()
   const [gridSize, setGridSize] = useState(3)
   const [grid, setGrid] = useState(() => initializeGrid(3, 3))
   const [colors, setColors] = useState(DEFAULT_COLORS)
@@ -172,8 +183,8 @@ export default function SquarePermutator() {
           Modular Permutations
         </h2>
         <p className="text-charcoal/60 text-sm max-w-2xl">
-          Generate valid granny square patterns where no two adjacent squares share the same color.
-          Optionally limit yarn with Stash Buster.
+          Assign yarn colors to modular crochet squares under graph-coloring constraints—no two
+          neighbors share a color. Optionally limit yarn with Stash Buster.
         </p>
       </div>
 
@@ -214,16 +225,12 @@ export default function SquarePermutator() {
               style={{
                 display: 'grid',
                 gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
-                gap: '8px',
-                maxWidth: '400px',
+                gap: '10px',
+                maxWidth: '420px',
                 width: '100%',
               }}
-              animate={
-                isGenerating
-                  ? { opacity: 0.55, scale: 0.985 }
-                  : { opacity: 1, scale: 1 }
-              }
-              transition={{ duration: 0.25 }}
+              animate={isGenerating ? { opacity: 0.62 } : { opacity: 1 }}
+              transition={{ duration: reduceMotion ? 0 : 0.2 }}
             >
               {grid.map((row, rowIndex) =>
                 row.map((color, colIndex) => {
@@ -231,6 +238,7 @@ export default function SquarePermutator() {
                     (sq) => sq.row === rowIndex && sq.col === colIndex
                   )
                   const staggerIndex = rowIndex * gridSize + colIndex
+                  const label = color ? COLOR_LABELS[colors.indexOf(color)] || '' : ''
 
                   return (
                     <motion.button
@@ -238,37 +246,49 @@ export default function SquarePermutator() {
                       type="button"
                       onClick={() => handleSquareClick(rowIndex, colIndex)}
                       initial={
-                        color
-                          ? { opacity: 0, scale: 0.72, y: 6 }
-                          : { opacity: 0.5, scale: 0.96 }
+                        reduceMotion
+                          ? false
+                          : color
+                            ? { opacity: 0.35, scale: 0.94 }
+                            : { opacity: 0.6, scale: 0.98 }
                       }
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
                       transition={{
-                        duration: 0.38,
-                        delay: color ? staggerIndex * 0.035 : 0,
-                        ease: [0.22, 1, 0.36, 1],
+                        duration: reduceMotion ? 0 : 0.2,
+                        delay:
+                          reduceMotion || !color
+                            ? 0
+                            : Math.min(staggerIndex * 0.02, 0.18),
+                        ease: 'easeOut',
                       }}
-                      whileHover={color ? { scale: 1.05 } : undefined}
-                      whileTap={{ scale: 0.97 }}
-                      className={`
-                        cursor-hook rounded-lg
-                        ${color ? '' : 'bg-charcoal/5 border-2 border-dashed border-charcoal/20'}
-                        ${isInvalid ? 'ring-2 ring-red-500 ring-offset-2' : ''}
-                        focus:outline-none focus:ring-2 focus:ring-yarn-blue focus:ring-offset-2
-                      `}
+                      whileHover={
+                        reduceMotion || !color ? undefined : { scale: 1.03 }
+                      }
+                      whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                      className={clsx(
+                        'cursor-hook rounded-md inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2',
+                        color && 'yarn-square',
+                        !color &&
+                          'bg-charcoal/[0.04] border border-dashed border-charcoal/20',
+                        isInvalid && 'ring-2 ring-red-500 ring-offset-2'
+                      )}
                       style={{
-                        background: color
-                          ? `radial-gradient(circle at 35% 35%, color-mix(in srgb, ${color} 85%, white), ${color})`
-                          : undefined,
+                        background: color ? yarnCellBackground(color) : undefined,
                         aspectRatio: '1 / 1',
                         width: '100%',
-                        minHeight: '60px',
+                        minHeight: '58px',
                         boxShadow: color
-                          ? `0 4px 14px color-mix(in srgb, ${color} 28%, transparent)`
+                          ? `0 2px 8px color-mix(in srgb, ${color} 22%, transparent)`
                           : undefined,
                       }}
-                      aria-label={`Square at row ${rowIndex + 1}, column ${colIndex + 1}, color ${color || 'empty'}`}
-                    />
+                      aria-label={`Square at row ${rowIndex + 1}, column ${colIndex + 1}, color ${color || 'empty'}${label ? ` (${label})` : ''}`}
+                    >
+                      {label && (
+                        <span className="relative z-[3] font-mono text-[10px] font-bold text-white/90 drop-shadow-sm">
+                          {label}
+                        </span>
+                      )}
+                    </motion.button>
                   )
                 })
               )}
@@ -288,7 +308,7 @@ export default function SquarePermutator() {
                     : '✗ Invalid Pattern'}
                 </span>
                 {attempts > 0 && (
-                  <span className="text-charcoal/60">
+                  <span className="type-meta">
                     Generated in {attempts} attempt{attempts !== 1 ? 's' : ''}
                   </span>
                 )}
@@ -367,8 +387,8 @@ export default function SquarePermutator() {
           </div>
 
           <div className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-display text-xl text-charcoal">Stash Buster</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-display text-xl text-charcoal">Yarn resources</h3>
               <label className="flex items-center gap-2 text-sm text-charcoal/70 cursor-pointer">
                 <input
                   type="checkbox"
@@ -379,105 +399,98 @@ export default function SquarePermutator() {
                 Limit yarn
               </label>
             </div>
-            <p className="text-sm text-charcoal/60 mb-3">
-              Yarn resources for this layout — the generator prefers abundant colors and respects
-              these caps.
+            <p className="text-sm text-charcoal/60 mb-4">
+              These swatches feed the pattern grid. With Stash Buster on, thread length shows how
+              much of each yarn you allow.
             </p>
-            {stashEnabled && (
-              <div className="space-y-2">
-                {colors.map((color, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <div
-                      className="w-6 h-6 rounded-full border border-charcoal/20 shrink-0"
-                      style={{ backgroundColor: color }}
-                      aria-hidden
-                    />
-                    <span className="type-meta w-6">
-                      {COLOR_LABELS[index] || index + 1}
-                    </span>
-                    <label className="sr-only" htmlFor={`stash-${index}`}>
-                      Max squares for color {COLOR_LABELS[index]}
-                    </label>
-                    <input
-                      id={`stash-${index}`}
-                      type="number"
-                      min={0}
-                      max={cellCount}
-                      value={stashLimits[index] ?? 0}
-                      onChange={(e) => handleStashLimitChange(index, e.target.value)}
-                      className="flex-1 min-w-0 h-8 px-2 text-sm font-mono border border-charcoal/15 rounded-md bg-canvas-white focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue"
-                    />
-                    <span className="type-meta shrink-0">max sq</span>
+
+            <div className="space-y-4">
+              {colors.map((color, index) => {
+                const used = colorDistribution[color] || 0
+                const max = stashEnabled ? stashLimits[index] ?? 0 : cellCount
+                const threadPct = Math.max(
+                  8,
+                  Math.round(((stashEnabled ? max : used || max) / cellCount) * 100)
+                )
+                const usedPct = Math.round((used / cellCount) * 100)
+                const over = stashEnabled && used > max
+
+                return (
+                  <div key={index} className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="yarn-swatch w-9 h-9 shrink-0"
+                        style={{ backgroundColor: color }}
+                        aria-hidden
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className="type-meta">Yarn {COLOR_LABELS[index]}</span>
+                          <span
+                            className={clsx(
+                              'type-meta',
+                              over && 'text-red-600 font-semibold'
+                            )}
+                          >
+                            {hasPattern ? `${used} used` : 'unused'}
+                            {stashEnabled ? ` · max ${max}` : ''}
+                          </span>
+                        </div>
+                        <div
+                          className="h-1.5 rounded-full bg-charcoal/[0.07] overflow-hidden"
+                          aria-hidden
+                        >
+                          <div
+                            className="h-full max-w-full rounded-full ui-transition"
+                            style={{
+                              width: `${stashEnabled ? threadPct : Math.max(usedPct, 12)}%`,
+                              background: color,
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <input
+                        type="color"
+                        value={color}
+                        onChange={(e) => {
+                          const newColors = [...colors]
+                          newColors[index] = e.target.value
+                          setColors(newColors)
+                        }}
+                        className="w-9 h-9 rounded-md cursor-hook border border-charcoal/10 shrink-0"
+                        aria-label={`Pick yarn color ${COLOR_LABELS[index]}`}
+                      />
+                    </div>
+
+                    {stashEnabled && (
+                      <div className="flex items-center gap-2 pl-12">
+                        <label className="sr-only" htmlFor={`stash-${index}`}>
+                          Max squares for yarn {COLOR_LABELS[index]}
+                        </label>
+                        <input
+                          id={`stash-${index}`}
+                          type="number"
+                          min={0}
+                          max={cellCount}
+                          value={stashLimits[index] ?? 0}
+                          onChange={(e) => handleStashLimitChange(index, e.target.value)}
+                          className="w-20 h-8 px-2 text-sm font-mono border border-charcoal/15 rounded-md bg-canvas-white focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue"
+                        />
+                        <span className="type-meta">max squares</span>
+                      </div>
+                    )}
                   </div>
-                ))}
-                {!stashFeasible && (
-                  <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded-md">
-                    Combined stash ({Object.values(quantityConstraints || {}).reduce((a, b) => a + b, 0)}){' '}
-                    is less than {cellCount} squares — raise a limit to generate.
-                  </p>
-                )}
-              </div>
+                )
+              })}
+            </div>
+
+            {stashEnabled && !stashFeasible && (
+              <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded-md mt-3">
+                Combined stash ({Object.values(quantityConstraints || {}).reduce((a, b) => a + b, 0)}){' '}
+                is less than {cellCount} squares — raise a limit to generate.
+              </p>
             )}
           </div>
-
-          <div className="p-4">
-            <h3 className="font-display text-xl text-charcoal mb-3">Yarn palette</h3>
-            <div className="grid grid-cols-2 gap-3">
-              {colors.map((color, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <div
-                    className="w-8 h-8 rounded-full border border-charcoal/20 shrink-0 shadow-[inset_0_-6px_8px_rgba(0,0,0,0.08)]"
-                    style={{ backgroundColor: color }}
-                    aria-hidden
-                  />
-                  <input
-                    type="color"
-                    value={color}
-                    onChange={(e) => {
-                      const newColors = [...colors]
-                      newColors[index] = e.target.value
-                      setColors(newColors)
-                    }}
-                    className="flex-1 h-8 rounded-md cursor-hook border border-charcoal/10"
-                    aria-label={`Yarn color ${COLOR_LABELS[index]}`}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {Object.keys(colorDistribution).length > 0 && (
-            <div className="p-4">
-              <h3 className="font-display text-xl text-charcoal mb-3">Color distribution</h3>
-              <div className="space-y-2">
-                {Object.entries(colorDistribution).map(([color, count]) => {
-                  const max = stashEnabled ? quantityConstraints?.[color] : null
-                  const over = max != null && count > max
-                  return (
-                    <div key={color} className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-3.5 h-3.5 rounded-full border border-charcoal/20"
-                          style={{ backgroundColor: color }}
-                        />
-                        <span className="text-charcoal/70">
-                          {Math.round((count / cellCount) * 100)}%
-                        </span>
-                      </div>
-                      <span
-                        className={clsx(
-                          'font-mono tabular-nums',
-                          over ? 'text-red-600 font-semibold' : 'text-charcoal'
-                        )}
-                      >
-                        {max != null ? `${count}/${max}` : count}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
         </aside>
       </div>
 
@@ -486,19 +499,16 @@ export default function SquarePermutator() {
         <StitchDivider color="rgba(26,26,26,0.12)" height={14} segmentCount={8} className="mb-4" />
         <ul className="text-sm text-charcoal/65 space-y-2 list-disc list-inside max-w-3xl">
           <li>
-            Click &quot;Generate Pattern&quot; to create a valid pattern using graph coloring
-            algorithms
+            Click &quot;Generate Pattern&quot; to assign yarn colors with a graph-coloring
+            algorithm
           </li>
-          <li>Click any square to manually change its color</li>
+          <li>Click any square to cycle its yarn color</li>
+          <li>No two adjacent squares (horizontal/vertical) may share the same color</li>
           <li>
-            The algorithm ensures no two adjacent squares (horizontal/vertical) share the same
-            color
+            Enable <strong>Limit yarn</strong> to cap squares per yarn — scarce colors are used
+            sparingly
           </li>
-          <li>
-            Enable <strong>Stash Buster</strong> to cap squares per yarn color — scarce colors are
-            used sparingly
-          </li>
-          <li>Invalid patterns are highlighted with red borders</li>
+          <li>Invalid squares are highlighted with red rings</li>
           <li>
             Use &quot;Export crochet pattern&quot; for a printable grid, row instructions, and yarn
             estimates
