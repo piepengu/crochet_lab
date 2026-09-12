@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Sparkles, GraduationCap, HeartHandshake, Brain } from 'lucide-react'
 import StitchDivider from './StitchDivider'
 
@@ -48,73 +48,99 @@ const MODULES = [
  * Visual landing: craft hero + photo paths into each module
  */
 export default function ImpactHome({ onNavigate, demoMode, onToggleDemo }) {
+  const reduceMotion = useReducedMotion()
+
   return (
     <div className="relative">
-      {/* Full-bleed craft hero — one composition */}
-      <section className="relative isolate min-h-[min(92dvh,880px)] w-full overflow-hidden">
+      {/* Full-bleed craft hero — localized text scrim, tactile photo */}
+      <section className="relative isolate min-h-[min(92dvh,880px)] w-full overflow-hidden bg-[#f3f1ed]">
         <motion.img
           src="/images/hero-bag-brown.jpg"
           alt=""
           aria-hidden
-          className="absolute inset-0 h-full w-full object-cover object-[center_30%]"
-          initial={{ scale: 1.08 }}
+          className="absolute inset-0 h-full w-full object-cover object-[68%_28%] sm:object-[center_30%]"
+          initial={reduceMotion ? false : { scale: 1.06 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+          transition={
+            reduceMotion
+              ? { duration: 0 }
+              : { duration: 1.35, ease: [0.22, 1, 0.36, 1] }
+          }
         />
+        {/* Left-weighted readability; center/right crochet stays visible */}
         <div
           className="absolute inset-0"
           style={{
-            background:
-              'linear-gradient(105deg, rgba(250,250,250,0.94) 0%, rgba(250,250,250,0.78) 38%, rgba(250,250,250,0.28) 62%, rgba(26,26,26,0.22) 100%)',
+            background: `
+              linear-gradient(
+                90deg,
+                rgba(250,250,248,0.97) 0%,
+                rgba(250,250,248,0.9) 18%,
+                rgba(250,250,248,0.55) 36%,
+                rgba(250,250,248,0.18) 52%,
+                rgba(250,250,248,0.04) 68%,
+                transparent 82%
+              ),
+              linear-gradient(
+                180deg,
+                transparent 0%,
+                transparent 55%,
+                rgba(250,250,248,0.35) 82%,
+                rgba(250,250,248,0.62) 100%
+              )
+            `,
           }}
           aria-hidden
         />
+        {/* Soft vignette only — no white haze */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.35] mix-blend-multiply"
+          className="pointer-events-none absolute inset-0"
           style={{
-            backgroundImage:
-              'radial-gradient(circle at 20% 20%, transparent 0, transparent 55%, rgba(26,26,26,0.08) 100%)',
+            background:
+              'radial-gradient(ellipse 70% 80% at 85% 40%, transparent 40%, rgba(26,26,26,0.12) 100%)',
           }}
           aria-hidden
         />
 
         <div className="relative z-10 flex min-h-[min(92dvh,880px)] flex-col justify-end lg:justify-center px-5 sm:px-8 lg:px-12 pb-14 pt-10 lg:pb-20 max-w-7xl mx-auto w-full">
           <motion.div
-            className="max-w-xl"
-            initial={{ opacity: 0, y: 28 }}
+            className="max-w-lg lg:max-w-xl"
+            initial={reduceMotion ? false : { opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 0.65, delay: 0.1, ease: [0.22, 1, 0.36, 1] }
+            }
           >
-            <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-yarn-blue mb-3">
-              Computational Crochet Lab
-            </p>
-            <h2 className="font-display text-[2.75rem] sm:text-5xl lg:text-6xl text-charcoal leading-[0.95] tracking-tight mb-4">
+            <p className="type-label text-yarn-blue mb-4">Computational Crochet Lab</p>
+            <h2 className="font-display text-[2.85rem] sm:text-5xl lg:text-[3.75rem] text-charcoal leading-[0.94] tracking-tight mb-3">
               <span className="block font-normal">The Algorithmic</span>
               <span className="block italic text-yarn-blue">Loop</span>
             </h2>
-            <p className="font-display italic text-charcoal/60 text-lg mb-5">
+            <p className="font-display italic text-charcoal/65 text-xl sm:text-2xl mb-5 leading-snug">
               Where craft meets computation
             </p>
-            <p className="text-charcoal/70 text-base sm:text-lg leading-relaxed mb-2 max-w-md">
+            <p className="font-sans text-charcoal/75 text-base sm:text-lg leading-relaxed mb-2 max-w-md">
               Math you can hold. Code you can crochet.
             </p>
-            <p className="text-sm text-charcoal/50 mb-7">
-              Created by <span className="font-semibold text-charcoal/70">Jason Zlatinski</span>
+            <p className="type-meta mb-8">
+              Created by <span className="text-charcoal/80 font-semibold">Jason Zlatinski</span>
             </p>
             <div className="flex flex-wrap gap-3">
               <motion.button
                 type="button"
                 onClick={() => onNavigate('doily')}
-                className="px-6 py-3 rounded-lg bg-yarn-blue text-white font-medium text-sm hover:bg-yarn-blue/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.98 }}
+                className="ui-transition px-6 py-3 rounded-md bg-yarn-blue text-white font-semibold text-sm hover:bg-yarn-blue/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+                whileHover={reduceMotion ? undefined : { y: -1 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               >
                 Enter the lab
               </motion.button>
               <button
                 type="button"
                 onClick={() => onNavigate('squares')}
-                className="px-6 py-3 rounded-lg border border-charcoal/20 bg-white/70 backdrop-blur-sm text-charcoal text-sm font-medium hover:bg-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+                className="ui-transition px-6 py-3 rounded-md border border-charcoal/20 bg-canvas-warm/80 text-charcoal text-sm font-semibold hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
               >
                 See patterns
               </button>
