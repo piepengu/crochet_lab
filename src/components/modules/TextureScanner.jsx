@@ -14,6 +14,22 @@ const mockPredictions = [
   { className: 'Knit Stitch', probability: 0.03 },
 ]
 
+/** On-brand sample for empty-state demos */
+const SAMPLE_TEXTURE_URL = '/images/texture-mesh.jpg'
+
+/**
+ * ImageNet / mock labels that suggest fiber, fabric, or craft surfaces.
+ * Used only for a soft UX note — not for filtering predictions.
+ */
+const CRAFT_HINT_PATTERN =
+  /crochet|knit|fabric|textile|yarn|wool|lace|velvet|silk|linen|cotton|sweater|cardigan|jersey|scarf|stole|shawl|quilt|blanket|towel|rug|doormat|mat|pillow|cushion|handkerchief|cloth|gauze|poncho|abaya|kimono|sari|sarong|apron|bib|curtain|screen|canvas|denim|fur|leather|suede|knitwear|stitch|doily/i
+
+function predictionsLookOffDomain(predictions) {
+  if (!predictions?.length) return false
+  const joined = predictions.map((p) => p.className || '').join(' ')
+  return !CRAFT_HINT_PATTERN.test(joined)
+}
+
 export default function TextureScanner({ demoMode = false }) {
   const [useMockMode, setUseMockMode] = useState(demoMode)
   const {
@@ -183,7 +199,7 @@ export default function TextureScanner({ demoMode = false }) {
 
   // Clear image
   const handleClear = useCallback(() => {
-    if (imageUrl) {
+    if (imageUrl?.startsWith('blob:')) {
       URL.revokeObjectURL(imageUrl)
     }
     setImageUrl(null)
@@ -196,6 +212,30 @@ export default function TextureScanner({ demoMode = false }) {
       fileInputRef.current.value = ''
     }
   }, [imageUrl])
+
+  const handleLoadSample = useCallback(() => {
+    if (imageUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(imageUrl)
+    }
+
+    setImageUrl(SAMPLE_TEXTURE_URL)
+    setPredictions(null)
+    setHeatmapUrl(null)
+    setHeatmapError(null)
+    setClassificationError(null)
+    setZoom(1)
+
+    const img = new Image()
+    img.onload = () => {
+      if (useMockMode || model) {
+        analyzeImage(img)
+      }
+    }
+    img.onerror = () => {
+      setClassificationError('Could not load the sample texture image')
+    }
+    img.src = SAMPLE_TEXTURE_URL
+  }, [imageUrl, useMockMode, model, analyzeImage])
 
   // Zoom controls
   const handleZoomIn = useCallback(() => {
@@ -210,6 +250,11 @@ export default function TextureScanner({ demoMode = false }) {
     setZoom(1)
   }, [])
 
+  const offDomainNote =
+    !useMockMode && predictionsLookOffDomain(predictions)
+      ? 'These ImageNet labels describe the whole scene more than yarn or fabric. Try a close-up of crochet, knit, or woven texture to inspect craft surfaces.'
+      : null
+
   return (
     <div className="p-4 lg:p-6 max-w-7xl mx-auto w-full overflow-hidden">
       {/* Header */}
@@ -218,7 +263,9 @@ export default function TextureScanner({ demoMode = false }) {
           Texture Recognition
         </h2>
         <p className="text-charcoal/60 text-sm max-w-2xl">
-          Upload an image to identify crochet patterns and textures using AI
+          Inspect craft photos with a browser-side ImageNet classifier (MobileNet). Best on
+          close-ups of crochet, knit, or woven texture—then read the attention map to see where
+          the network looks.
         </p>
       </div>
 
@@ -280,7 +327,7 @@ export default function TextureScanner({ demoMode = false }) {
         <div className="flex flex-col gap-4 min-w-0">
           {/* Upload Area */}
           {!imageUrl ? (
-            <>
+            <div className="space-y-3">
               <input
                 id={fileInputId}
                 ref={fileInputRef}
@@ -298,12 +345,21 @@ export default function TextureScanner({ demoMode = false }) {
                 <Upload size={42} className="mx-auto mb-4 text-yarn-blue/65" />
                 <p className="type-label mb-2">Image specimen</p>
                 <h3 className="font-display text-2xl text-charcoal mb-2">
-                  Drag & drop an image here
+                  Drag & drop a craft photo here
                 </h3>
-                <p className="text-sm text-charcoal/60 mb-4">or click to browse</p>
+                <p className="text-sm text-charcoal/60 mb-4">
+                  Prefer a close-up of crochet, knit, or fabric — or click to browse
+                </p>
                 <p className="type-meta">JPG · PNG · WebP</p>
               </label>
-            </>
+              <button
+                type="button"
+                onClick={handleLoadSample}
+                className="ui-transition w-full px-4 py-2.5 rounded-md border border-charcoal/20 bg-canvas-warm/80 text-charcoal text-sm font-semibold hover:border-yarn-blue/40 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-yarn-blue focus-visible:ring-offset-2"
+              >
+                Try sample crochet texture
+              </button>
+            </div>
           ) : (
             <div className="border border-charcoal/12 rounded-md p-4 bg-canvas-warm/40">
               {/* Image Preview with Zoom */}
@@ -311,7 +367,7 @@ export default function TextureScanner({ demoMode = false }) {
                 <img
                   ref={imageRef}
                   src={imageUrl}
-                  alt="Uploaded crochet texture"
+                  alt="Uploaded image for texture analysis"
                   style={{
                     width: '100%',
                     height: '100%',
@@ -417,7 +473,7 @@ export default function TextureScanner({ demoMode = false }) {
             <section className="border border-charcoal/15 rounded-md bg-[#f1f3f3] overflow-hidden">
               <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-charcoal/10 bg-[#e8ecec]">
                 <div>
-                  <p className="type-label mb-1">Scientific instrument · image classifier</p>
+                  <p className="type-label mb-1">Scientific instrument · ImageNet classifier</p>
                   <h3 className="font-display text-2xl text-charcoal">Classification results</h3>
                 </div>
                 <span className="inline-flex items-center gap-1.5 type-meta text-charcoal/65">
@@ -427,6 +483,12 @@ export default function TextureScanner({ demoMode = false }) {
               </div>
 
               <div className="p-5 sm:p-6 space-y-5">
+                {offDomainNote && (
+                  <p className="text-sm text-amber-900/90 bg-amber-50 border border-amber-200/80 rounded-md px-3 py-2.5 leading-relaxed">
+                    {offDomainNote}
+                  </p>
+                )}
+
                 {predictions.map((pred, index) => (
                   <div key={index} className="space-y-2">
                     <div className="flex items-baseline justify-between gap-3">
@@ -501,8 +563,17 @@ export default function TextureScanner({ demoMode = false }) {
               <p className="text-sm text-charcoal/60 mb-5 max-w-xs">
                 {imageUrl
                   ? 'Classification results will appear here'
-                  : 'Upload an image to see classification results'}
+                  : 'Upload a craft close-up—or try the sample—to see ImageNet labels and an attention map'}
               </p>
+              {!imageUrl && (
+                <button
+                  type="button"
+                  onClick={handleLoadSample}
+                  className="ui-transition px-5 py-2.5 mb-3 border border-charcoal/20 bg-white text-charcoal rounded-md hover:border-yarn-blue/40 font-semibold text-sm"
+                >
+                  Try sample crochet texture
+                </button>
+              )}
               {imageUrl && !classifying && (
                 <button
                   type="button"
@@ -522,11 +593,17 @@ export default function TextureScanner({ demoMode = false }) {
         <h3 className="font-display text-xl text-charcoal mb-2">How it works</h3>
         <StitchDivider color="rgba(26,26,26,0.15)" height={16} segmentCount={8} className="mb-3" />
         <ul className="text-sm text-charcoal/65 space-y-2 list-disc list-inside max-w-3xl">
-          <li>Upload an image of crochet work or textured fabric</li>
-          <li>The AI model will automatically analyze and classify the texture</li>
+          <li>
+            Upload a close-up of crochet, knit, or fabric—or use &quot;Try sample crochet
+            texture&quot;
+          </li>
+          <li>
+            MobileNet (ImageNet) classifies the photo in the browser; mock mode uses craft-themed
+            demo labels for presentations
+          </li>
           <li>Results show the top 3 predictions with confidence percentages</li>
           <li>Use zoom controls to examine image details</li>
-          <li>Click &quot;Re-classify&quot; to analyze the image again</li>
+          <li>Click &quot;Analyze again&quot; to re-run the classifier</li>
           <li>
             The attention heatmap highlights regions the model focuses on (texture, edges,
             patterns)
