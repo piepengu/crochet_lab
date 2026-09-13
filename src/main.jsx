@@ -4,6 +4,20 @@ import './index.css'
 import App from './App.jsx'
 import ErrorBoundary from './components/shared/ErrorBoundary'
 
+// An open tab can reference a hashed chunk removed by a newer deployment.
+// Vite emits this event before the failed dynamic import reaches React.
+window.addEventListener('vite:preloadError', (event) => {
+  const reloadKey = 'crochet-lab:preload-reload'
+  const lastReload = Number(sessionStorage.getItem(reloadKey) || 0)
+
+  // Reload once, then let the error boundary handle genuine network failures.
+  if (Date.now() - lastReload > 10_000) {
+    event.preventDefault()
+    sessionStorage.setItem(reloadKey, String(Date.now()))
+    window.location.reload()
+  }
+})
+
 console.log('main.jsx: Starting application initialization')
 
 const rootElement = document.getElementById('root')
