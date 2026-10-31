@@ -595,13 +595,13 @@ export default function DoilyGraph() {
               loading="lazy"
             />
             <figcaption className="type-meta mt-2">
-              Crochet pieces courtesy of a friend.
+              Crocheted by Minka Gocheva.
             </figcaption>
           </figure>
           <div>
             <h3 className="font-display text-2xl text-charcoal mb-3">Inspiration</h3>
             <p className="text-sm sm:text-base text-charcoal/65 leading-relaxed max-w-2xl">
-              Inspired by crocheted dolls, scarves, hats, and bags gifted by a friend, CrochetLab
+              Inspired by crocheted dolls, scarves, hats, and bags made by Minka Gocheva, CrochetLab
               asks how simple loops can generate complex mathematical forms—and whether code can
               help makers explore those forms before picking up a hook.
             </p>

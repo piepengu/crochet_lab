@@ -29,9 +29,17 @@ export default function Manifesto() {
   }
 
   return (
-    <div className="min-h-screen bg-canvas-white">
+    <div className="relative min-h-screen bg-canvas-white">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[880px] bg-no-repeat bg-top"
+        style={{
+          backgroundImage: 'url(/images/doily-minka-bg.jpg)',
+          backgroundSize: 'min(860px, 118%)',
+        }}
+      />
       <motion.article
-        className="max-w-3xl mx-auto px-6 py-12 lg:py-20"
+        className="relative max-w-3xl mx-auto px-6 py-12 lg:py-20 bg-canvas-white/75"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -49,6 +57,9 @@ export default function Manifesto() {
           </p>
           <p className="text-sm text-charcoal/55">
             By <span className="font-semibold text-charcoal">Jason Zlatinski</span>
+          </p>
+          <p className="text-xs text-charcoal/50 mt-4">
+            Background doily crocheted by Minka Gocheva.
           </p>
         </motion.header>
 
@@ -228,10 +239,28 @@ export default function Manifesto() {
             className="text-charcoal/80 leading-relaxed space-y-4"
             style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
           >
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-start">
+              <figure className="shrink-0 w-40 sm:w-44">
+                <img
+                  src="/images/minka-gocheva.jpg"
+                  alt="Minka Gocheva, second from the right, whose crochet creations inspired this project"
+                  className="w-full h-auto"
+                  loading="lazy"
+                />
+                <figcaption className="mt-2 text-xs leading-snug text-charcoal/55">
+                  Minka Gocheva (second from right), my grandmother’s longtime friend in Bulgaria, whose crochet creations inspired The Algorithmic Loop.
+                </figcaption>
+              </figure>
+              <p>
+                The crocheted pieces in this project were made by Minka Gocheva.
+                Her dolls, scarves, hats, and bags are the physical work this lab
+                studies, including the doily behind this page.
+              </p>
+            </div>
             <p>
-              Inspired by the work of mathematician Daina Taimina, who first 
-              crocheted models of hyperbolic planes, and by countless crafters 
-              who have passed down these algorithms through generations.
+              The mathematical models draw on mathematician Daina Taimina, who
+              first crocheted hyperbolic planes, and on the crafters who have
+              passed these algorithms down through generations.
             </p>
             <p>
               Special thanks to the open-source community for the incredible 
